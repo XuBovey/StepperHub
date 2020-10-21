@@ -422,6 +422,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     Stepper_ExecuteAllControllers();
     Serial_CheckRxTimeout();
     
+    input_scan();
+    
     led_toggle(LED_YEL_GPIO_Port, LED_YEL_Pin);
   }
 }

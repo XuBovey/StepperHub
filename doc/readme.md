@@ -1,0 +1,81 @@
+# 2020-10-20
+
+## 十字滑台TB板接口规划
+
+步进电机控制IO分配表：
+
+|电机编号|步进控制 STP|方向控制 DIR|使能 EN|限位|公共端COM|
+|---|---|---|---|---|---|
+|X轴|PA7/**X8** TIM8CH1N|PB10/**Y9**|PB11/**Y10**|PB7/**X10**|3.3V|
+|Y轴|PA5/**X6** TIM2CH1|PA4/**X5**|PA6/**X7**|PB6/**X9**|3.3V|
+|Z轴|PB13/**Y6** TIM1CH1N|PB12/**Y5**|PB14/**Y7**|PB15/**Y8**|3.3V|
+
+其他功能IO分配表：
+
+|功能|管脚分配|
+|---|---|
+|吸盘|PB8/**Y3** (接口板丝印X3)|
+|RX|PA3/**X4**|
+|TX|PA2/**X3**|
+|预留|PC5/**X12** (接口板丝印X4)，预留为用户按键|
+
+限位器控制放在中断函数中执行，当产生中断时停止执行。
+
+## stepperhub增补stepper_state结构体
+
+增加代码如下：
+
+```c
+// stepperController.h
+typedef HAL_StatusTypeDef (*funPwmCtrl)(TIM_HandleTypeDef * STEP_TIMER, uint32_t  STEP_CHANNEL);
+typedef struct {
+    char name;
+
+    // ...
+
+    // start fun
+    funPwmCtrl start;
+
+    // stop fun
+    funPwmCtrl stop;
+} stepper_state;
+```
+
+这样可使驱动支持STM32上CH*N之类的PWM输出，因需用到`stm32f4xx_hal_tim_ex.h`中的库函数。
+
+## 电机控制命令
+
+参考根目录readme.md
+
+格式：
+
+```
+<command><stepper>[.parameter][:value]
+
+<command>     : add | set | reset | get
+<stepper>     : X | Y | Z  (or whatever single-letter names will be added in the future)
+[.parameter]  : parameter name (the field of the stepper_state structure)
+[:value]      : any 32-bit signed integer value (-2147483648 .. 2147483647)
+```
+
+## 限位器设计思路
+
+限位器的状态由定时器5的回调函数中查询并发现边沿信号。信号触发时设置当前位置为目的位置，使电机制动，为了达到迅速制动的目的，还修改了`Stepper_PulseTimerUpdate`函数的`SS_RUNNING_FORWARD`和`SS_RUNNING_BACKWARD`状态的处理。增加代码段：
+
+```c
+      // handle stop from limited switch.
+      if (stepper->currentPosition == stepper->targetPosition) {
+          stepper->status = SS_STOPPED;
+          stepper->stop(stepper->STEP_TIMER, stepper->STEP_CHANNEL);
+          stepper -> currentSPS = stepper -> minSPS;
+          kprintf("limited %c.stop:%ld\r\n", stepper->name, stepper->currentPosition);
+          break;
+      }
+```
+
+## 其中：
+
+- **get** - returns the current value of the [parameter] 
+- **add** - adds [value] to the current [parameter] value
+- **set** - sets new [value] to the [parameter]
+- **reset** - resets the [parameter] to its factory default (may used with ".all")

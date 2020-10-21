@@ -41,6 +41,7 @@ void MX_GPIO_Init(void);
 void led_toggle(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void led_on(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void led_off(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
+void input_scan(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

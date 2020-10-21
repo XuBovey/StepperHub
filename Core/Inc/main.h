@@ -66,12 +66,20 @@ void Error_Handler(void);
 #define Y_DIR_GPIO_Port GPIOA
 #define Y_STEP_Pin GPIO_PIN_5
 #define Y_STEP_GPIO_Port GPIOA
+#define Y_EN_Pin GPIO_PIN_6
+#define Y_EN_GPIO_Port GPIOA
 #define X_DIR_Pin GPIO_PIN_10
 #define X_DIR_GPIO_Port GPIOB
+#define X_EN_Pin GPIO_PIN_11
+#define X_EN_GPIO_Port GPIOB
 #define Z_DIR_Pin GPIO_PIN_12
 #define Z_DIR_GPIO_Port GPIOB
 #define Z_STEP_Pin GPIO_PIN_13
 #define Z_STEP_GPIO_Port GPIOB
+#define Z_EN_Pin GPIO_PIN_14
+#define Z_EN_GPIO_Port GPIOB
+#define Z_LIMIT_Pin GPIO_PIN_15
+#define Z_LIMIT_GPIO_Port GPIOB
 #define LED_RED_Pin GPIO_PIN_13
 #define LED_RED_GPIO_Port GPIOA
 #define LED_GRN_Pin GPIO_PIN_14
@@ -82,6 +90,12 @@ void Error_Handler(void);
 #define SW_USR_GPIO_Port GPIOB
 #define LED_BLU_Pin GPIO_PIN_4
 #define LED_BLU_GPIO_Port GPIOB
+#define Y_LIMIT_Pin GPIO_PIN_6
+#define Y_LIMIT_GPIO_Port GPIOB
+#define X_LIMIT_Pin GPIO_PIN_7
+#define X_LIMIT_GPIO_Port GPIOB
+#define PUMP_SW_Pin GPIO_PIN_8
+#define PUMP_SW_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
