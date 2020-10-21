@@ -58,7 +58,21 @@ typedef struct {
 [:value]      : any 32-bit signed integer value (-2147483648 .. 2147483647)
 ```
 
-## 限位器设计思路
+## 电机转速计算
+
+电机转速由PWM频率控制，其配置由函数`SetStepTimerByCurrentSPS`完成。其最主要的部分是:
+
+``` c
+uint32_t timerTicks = STEP_TIMER_CLOCK / stepper -> currentSPS;
+```
+
+STEP_TIMER_CLOCK为定时器时钟，程序中配置为84MHz。`currentSPS`为当前脉冲频率，除法的结果就是定时器计数周期数。而`currentSPS`是在`minSPS`和`maxSPS`之间的。
+
+速度变化的快慢取决于`accelerationSPS`即加速度，每次修改`currentSPS`的步进值。
+
+`currentSPS`是控制电机的脉冲，电机转速的转换还要考虑步距角和电机驱动的细分，例如当前采用的电机步距角是1.8度，即每圈需要200个步进，细分为32是把每个步进细分为32个脉冲，所以电机完整转一圈需要200*32=6400个脉冲，电机的转速就是currentSPS*60/6400rpm
+
+## 限位器工作原理
 
 限位器的状态由定时器5的回调函数中查询并发现边沿信号。信号触发时设置当前位置为目的位置，使电机制动，为了达到迅速制动的目的，还修改了`Stepper_PulseTimerUpdate`函数的`SS_RUNNING_FORWARD`和`SS_RUNNING_BACKWARD`状态的处理。增加代码段：
 
