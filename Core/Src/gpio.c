@@ -53,8 +53,8 @@ void MX_GPIO_Init(void)
                           |LED_YEL_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, X_DIR_Pin|X_EN_Pin|Z_DIR_Pin|Z_EN_Pin
-                          |LED_BLU_Pin|PUMP_SW_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, X_DIR_Pin|X_EN_Pin|LED_BLU_Pin|Z_DIR_Pin
+                          |Z_EN_Pin|PUMP_SW_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : PAPin PAPin */
   GPIO_InitStruct.Pin = Y_DIR_Pin|Y_EN_Pin;
@@ -73,7 +73,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = Z_LIMIT_Pin|Y_LIMIT_Pin|X_LIMIT_Pin;
+  GPIO_InitStruct.Pin = Y_LIMIT_Pin|X_LIMIT_Pin|Z_LIMIT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -158,7 +158,6 @@ void input_scan(void){
   if (x_limitCurrentState != x_limitLastState){ // 边沿触发
     x_limitLastState = x_limitCurrentState;
     if (x_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
-      // 事件处理
       // 设置目标位置为当前位置，使电机停�?
       targetPostion = Stepper_GetTargetPosition('X');
       currentPostion = Stepper_GetCurrentPosition('X');
@@ -166,13 +165,13 @@ void input_scan(void){
       if (targetPostion != currentPostion){
         Stepper_SetTargetPosition('X', Stepper_GetCurrentPosition('X'));
       }
+      kprintf("X limit switch close, stop.\r\n");
     }
   }
 
   if (y_limitCurrentState != y_limitLastState){ // 边沿触发
     y_limitLastState = y_limitCurrentState;
     if (y_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
-      // 事件处理
       // 设置目标位置为当前位置，使电机停�?
       targetPostion = Stepper_GetTargetPosition('Y');
       currentPostion = Stepper_GetCurrentPosition('Y');
@@ -180,13 +179,13 @@ void input_scan(void){
       if (targetPostion != currentPostion){
         Stepper_SetTargetPosition('Y', Stepper_GetCurrentPosition('Y'));
       }
+      kprintf("Y limit switch close, stop.\r\n");
     }
   }
 
   if (z_limitCurrentState != z_limitLastState){ // 边沿触发
     z_limitLastState = z_limitCurrentState;
     if (z_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
-      // 事件处理
       // 设置目标位置为当前位置，使电机停�?
       targetPostion = Stepper_GetTargetPosition('Z');
       currentPostion = Stepper_GetCurrentPosition('Z');
@@ -194,6 +193,7 @@ void input_scan(void){
       if (targetPostion != currentPostion){
         Stepper_SetTargetPosition('Z', Stepper_GetCurrentPosition('Z'));
       }
+      kprintf("Z limit switch close, stop.\r\n");
     }
   }
 }
