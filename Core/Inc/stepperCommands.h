@@ -26,7 +26,10 @@ typedef enum {
   PARAM_ACCSPS          = 7,
   PARAM_ACCPRESCALER    = 8,
   PARAM_STATUS          = 9,
-  __PARAM_COUNT           = 10
+  // writeonlies
+  PARAM_STEPPEREN       = 10,
+  PARAM_PUMP            = 11,
+  __PARAM_COUNT           = 12
 } request_params;
 
 typedef struct {

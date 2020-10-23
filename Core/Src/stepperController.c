@@ -2,6 +2,7 @@
 #include "stepperController.h"
 #include "stdio.h"
 #include "serial.h"
+#include "gpio.h"
 
 static stepper_state steppers[MAX_STEPPERS_COUNT];
 static int32_t initializedSteppersCount;
@@ -418,6 +419,16 @@ stepper_error Stepper_SetAccPrescaler(char stepperName, int32_t value){
     return  (value < 1) ? SERR_LIMIT : SERR_OK;
   }
   return SERR_MUSTBESTOPPED;
+}
+
+int32_t Stepper_SetEn(char stepperName, int32_t value){
+  setStepperEn(stepperName, (uint8_t)value);
+  return SERR_OK;
+}
+
+int32_t Pump_SetEn(int32_t value){
+  setPumpEn((uint8_t)value);
+  return SERR_OK;
 }
 
 // Sets the new target position (step number) of the motor (where it should rotate to).

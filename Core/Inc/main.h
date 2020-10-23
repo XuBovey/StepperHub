@@ -68,6 +68,8 @@ void Error_Handler(void);
 #define Y_STEP_GPIO_Port GPIOA
 #define Y_EN_Pin GPIO_PIN_6
 #define Y_EN_GPIO_Port GPIOA
+#define X_STEP_Pin GPIO_PIN_7
+#define X_STEP_GPIO_Port GPIOA
 #define X_DIR_Pin GPIO_PIN_10
 #define X_DIR_GPIO_Port GPIOB
 #define X_EN_Pin GPIO_PIN_11

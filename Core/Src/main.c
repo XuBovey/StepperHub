@@ -115,12 +115,12 @@ int main(void)
   HAL_Delay(1);
 
   kprintf("\r\n");
-  kprintf ("============== Stepper Hub ================\r\n");
+  kprintf ("========= Stepper Hub for STM32F405 ==========\r\n");
   kprintf ("  Timer Clock: %ld MHz StepperCtrl: %ld us\r\n", STEP_TIMER_CLOCK/1000000, STEP_CONTROLLER_PERIOD_US);
-  kprintf ("  X Step:PA7  Tim:8 Ch:1 Dir: PB10 En: none\r\n");
-  kprintf ("  Y Step:PA5  Tim:2 Ch:1 Dir: PA4  En: none\r\n");
-  kprintf ("  Z Step:PB13 Tim:1 Ch:1 Dir: PB12 En: none\r\n");
-  kprintf ("===========================================\r\n");
+  kprintf ("  X Step:PA7  Tim:8 Ch:1N Dir: PB10 En: none\r\n");
+  kprintf ("  Y Step:PA5  Tim:2 Ch:1  Dir: PA4  En: none\r\n");
+  kprintf ("  Z Step:PB13 Tim:1 Ch:1N Dir: PB12 En: none\r\n");
+  kprintf ("==============================================\r\n");
   kprintf("\r\n");
 
   Stepper_SetupPeripherals('X', &X_TIM, X_TIM_CH, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, X_DIR_GPIO_Port, X_DIR_Pin);
@@ -145,7 +145,7 @@ int main(void)
 
   Serial_InitRxSequence();
 
-  HAL_Delay(1);
+  HAL_Delay(100);
   // This will run our StepController timer and enable interrupt for it as well
   HAL_TIM_Base_Start_IT(&htim5);
   
@@ -156,6 +156,11 @@ int main(void)
   ExecuteRequest(&stReq);
   stReq.stepper = 'Z';
   ExecuteRequest(&stReq);
+
+  kprintf("\r\nEnable all stepper!\r\n\r\n");
+  Stepper_SetEn('X', 1);
+  Stepper_SetEn('Y', 1);
+  Stepper_SetEn('Z', 1);
 
 #if defined (TEST) 
 

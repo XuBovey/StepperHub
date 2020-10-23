@@ -116,6 +116,33 @@ void led_off(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET);
 }
 
+void setStepperEn(char stepper, uint8_t value)
+{
+  uint8_t state;
+
+  if (value ==0){
+    state = value;
+  }else
+    state = 1;
+
+  switch (stepper)
+  {
+  case 'X': HAL_GPIO_WritePin(X_EN_GPIO_Port, X_EN_Pin, state); break;
+  case 'Y': HAL_GPIO_WritePin(Y_EN_GPIO_Port, Y_EN_Pin, state); break;
+  case 'Z': HAL_GPIO_WritePin(Z_EN_GPIO_Port, Z_EN_Pin, state); break;
+  default:
+    break;
+  }
+}
+
+void setPumpEn(uint8_t value)
+{
+  if (value == 0){
+    HAL_GPIO_WritePin(PUMP_SW_GPIO_Port, PUMP_SW_Pin, GPIO_PIN_RESET);
+  }else
+    HAL_GPIO_WritePin(PUMP_SW_GPIO_Port, PUMP_SW_Pin, GPIO_PIN_SET);
+}
+
 void input_scan(void){
   static uint8_t x_limitLastState = 1;
   static uint8_t y_limitLastState = 1;
@@ -132,7 +159,7 @@ void input_scan(void){
     x_limitLastState = x_limitCurrentState;
     if (x_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
       // 事件处理
-      // 设置目标位置为当前位置，使电机停止
+      // 设置目标位置为当前位置，使电机停�?
       targetPostion = Stepper_GetTargetPosition('X');
       currentPostion = Stepper_GetCurrentPosition('X');
 
@@ -146,7 +173,7 @@ void input_scan(void){
     y_limitLastState = y_limitCurrentState;
     if (y_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
       // 事件处理
-      // 设置目标位置为当前位置，使电机停止
+      // 设置目标位置为当前位置，使电机停�?
       targetPostion = Stepper_GetTargetPosition('Y');
       currentPostion = Stepper_GetCurrentPosition('Y');
 
@@ -160,7 +187,7 @@ void input_scan(void){
     z_limitLastState = z_limitCurrentState;
     if (z_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
       // 事件处理
-      // 设置目标位置为当前位置，使电机停止
+      // 设置目标位置为当前位置，使电机停�?
       targetPostion = Stepper_GetTargetPosition('Z');
       currentPostion = Stepper_GetCurrentPosition('Z');
 

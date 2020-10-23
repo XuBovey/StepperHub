@@ -136,7 +136,7 @@ But the only disadvantage is that there are ceratin limitations to the request f
 
 
 static char * request_commands_arry[__CMD_COUNT] = {"UNKNOWN", "ADD", "GET", "SET", "RESET"};
-static char * request_params_arry[__PARAM_COUNT] = {"UNDEFINED", "ALL", "TARGETPOSITION", "CURRENTPOSITION", "MINSPS", "MAXSPS", "CURRENTSPS", "ACCSPS", "ACCPRESCALER", "STATUS"};
+static char * request_params_arry[__PARAM_COUNT] = {"UNDEFINED", "ALL", "TARGETPOSITION", "CURRENTPOSITION", "MINSPS", "MAXSPS", "CURRENTSPS", "ACCSPS", "ACCPRESCALER", "STATUS", "STEPPEREN", "PUMP"};
 
 
 typedef enum {
@@ -189,6 +189,8 @@ stepper_error SetParamValue(char stepper, request_params param, int32_t value) {
         case PARAM_CURRENTPOSITION: return Stepper_SetCurrentPosition(stepper, value);
         case PARAM_MINSPS:          return Stepper_SetMinSPS(stepper, value);
         case PARAM_MAXSPS:          return Stepper_SetMaxSPS(stepper, value);
+        case PARAM_STEPPEREN:       return Stepper_SetEn(stepper, value);
+        case PARAM_PUMP:            return Pump_SetEn(value);
         default:  return (stepper_error)0xFF; // codding error, will give "Unknown error" output
     }
 }
@@ -443,7 +445,8 @@ void DecodeCmd(uint8_t data) {
 }
 
 void DecodeStepper(uint8_t data) {
-  if (Stepper_GetStatus(data) == SS_UNDEFINED) {
+  // 'P' for pump
+  if ((Stepper_GetStatus(data) == SS_UNDEFINED) && (data != 'P')) {
     // There is no such stepper found
     // So return error immediately
     ExecuteRequest(&req);

@@ -177,4 +177,6 @@ void Stepper_LoadConfig(void);
 // to FLASH memeory (Sector 1)
 void Stepper_SaveConfig(void);  
 
+int32_t Pump_SetEn(int32_t value);
+int32_t Stepper_SetEn(char stepperName, int32_t value);
 #endif //_STEPPER_CONTROLLER_H_
