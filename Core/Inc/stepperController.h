@@ -179,4 +179,5 @@ void Stepper_SaveConfig(void);
 
 int32_t Pump_SetEn(int32_t value);
 int32_t Stepper_SetEn(char stepperName, int32_t value);
+void stopAllStepper();
 #endif //_STEPPER_CONTROLLER_H_

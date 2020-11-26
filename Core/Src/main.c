@@ -101,7 +101,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_USB_DEVICE_Init();
+  // MX_USB_DEVICE_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM8_Init();
@@ -113,7 +113,7 @@ int main(void)
   STEP_CONTROLLER_PERIOD_US =  1000000U /(STEP_TIMER_CLOCK / htim5.Init.Period);
   
   HAL_Delay(1);
-
+#if 0
   kprintf("\r\n");
   kprintf ("========= Stepper Hub for STM32F405 ==========\r\n");
   kprintf ("  Timer Clock: %ld MHz StepperCtrl: %ld us\r\n", STEP_TIMER_CLOCK/1000000, STEP_CONTROLLER_PERIOD_US);
@@ -122,22 +122,22 @@ int main(void)
   kprintf ("  Z Step:PB13 Tim:1 Ch:1N Dir: PB12 En: none\r\n");
   kprintf ("==============================================\r\n");
   kprintf("\r\n");
-
+#endif
   Stepper_SetupPeripherals('X', &X_TIM, X_TIM_CH, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, X_DIR_GPIO_Port, X_DIR_Pin);
   Stepper_SetupPeripherals('Y', &Y_TIM, Y_TIM_CH, &HAL_TIM_PWM_Start, &HAL_TIM_PWM_Stop, Y_DIR_GPIO_Port, Y_DIR_Pin);
   Stepper_SetupPeripherals('Z', &Z_TIM, Z_TIM_CH, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, Z_DIR_GPIO_Port, Z_DIR_Pin);
   
-  kprintf("Reading settings from internal storage...\r\n");
+  // kprintf("Reading settings from internal storage...\r\n");
   Stepper_LoadConfig();
 
   if (Stepper_GetAccPrescaler('Z') == 0xFFFFFFFF) {
-    kprintf("Storage is clean, initializing defaults ...\r\n");
+    // kprintf("Storage is clean, initializing defaults ...\r\n");
     Stepper_InitDefaultState('X');
     Stepper_InitDefaultState('Y');
     Stepper_InitDefaultState('Z');
     Stepper_SaveConfig();
   } 
-  kprintf("DONE!\r\n\r\n");
+  // kprintf("DONE!\r\n\r\n");
 
   __HAL_TIM_ENABLE_IT(&X_TIM, TIM_IT_UPDATE);
   __HAL_TIM_ENABLE_IT(&Y_TIM, TIM_IT_UPDATE);
@@ -157,10 +157,12 @@ int main(void)
   stReq.stepper = 'Z';
   ExecuteRequest(&stReq);
 
-  kprintf("\r\nEnable all stepper!\r\n\r\n");
-  Stepper_SetEn('X', 1);
-  Stepper_SetEn('Y', 1);
-  Stepper_SetEn('Z', 1);
+  // kprintf("\r\nEnable all stepper!\r\n\r\n");
+  Stepper_SetEn('X', 0);
+  Stepper_SetEn('Y', 0);
+  Stepper_SetEn('Z', 0);
+
+  Pump_SetEn(1);
 
 #if defined (TEST) 
 
@@ -236,7 +238,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  usb_printf("error\r\n");
+  kprintf("Error_Handler\r\n");
   /* USER CODE END Error_Handler_Debug */
 }
 

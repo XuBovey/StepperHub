@@ -26,6 +26,7 @@
 #include "usbd_cdc_if.h"
 #include "gpio.h"
 #include "stepperController.h"
+#include "serial.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -93,7 +94,11 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
-
+  kprintf("Error: HardFault_Handler\r\n");
+  stopAllStepper();
+  Stepper_SetEn('X', 0);
+  Stepper_SetEn('Y', 0);
+  Stepper_SetEn('Z', 0);
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
@@ -108,7 +113,7 @@ void HardFault_Handler(void)
 void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
-
+  kprintf("Error: MemManage_Handler\r\n");
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
   {
@@ -123,7 +128,7 @@ void MemManage_Handler(void)
 void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
-
+  kprintf("Error: BusFault_Handler\r\n");
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
   {
@@ -138,7 +143,7 @@ void BusFault_Handler(void)
 void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */
-
+  kprintf("Error: UsageFault_Handler\r\n");
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
   {
@@ -239,13 +244,18 @@ void DMA1_Stream6_IRQHandler(void)
 void TIM1_UP_TIM10_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
+  static int count = 0;
   if (__HAL_TIM_GET_FLAG(&htim1, TIM_FLAG_UPDATE))
   {
     if (__HAL_TIM_GET_ITSTATUS(&htim1, TIM_IT_UPDATE))
     {
       __HAL_TIM_CLEAR_FLAG(&htim1, TIM_FLAG_UPDATE);
       Stepper_PulseTimerUpdate('Z');
-      led_toggle(LED_BLU_GPIO_Port, LED_BLU_Pin);
+      if(count ++ > 200)
+      {
+        count = 0;
+        led_toggle(LED_BLU_GPIO_Port, LED_BLU_Pin);
+      }
     }
   }
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
@@ -260,13 +270,18 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
+  static int count = 0;
   if (__HAL_TIM_GET_FLAG(&htim2, TIM_FLAG_UPDATE))
   {
     if (__HAL_TIM_GET_ITSTATUS(&htim2, TIM_IT_UPDATE))
     {
       __HAL_TIM_CLEAR_FLAG(&htim2, TIM_FLAG_UPDATE);
       Stepper_PulseTimerUpdate('Y');
-      led_toggle(LED_GRN_GPIO_Port, LED_GRN_Pin);
+      if(count ++ > 200)
+      {
+        count = 0;
+        led_toggle(LED_YEL_GPIO_Port, LED_GRN_Pin);
+      }
     }
   }
   /* USER CODE END TIM2_IRQn 0 */
@@ -295,13 +310,19 @@ void USART2_IRQHandler(void)
 void TIM8_UP_TIM13_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM8_UP_TIM13_IRQn 0 */
+  static int count = 0;
   if (__HAL_TIM_GET_FLAG(&htim8, TIM_FLAG_UPDATE))
   {
     if (__HAL_TIM_GET_ITSTATUS(&htim8, TIM_IT_UPDATE))
     {
       __HAL_TIM_CLEAR_FLAG(&htim8, TIM_FLAG_UPDATE);
       Stepper_PulseTimerUpdate('X');
-      led_toggle(LED_RED_GPIO_Port, LED_RED_Pin);
+
+      if(count ++ > 200)
+      {
+        led_toggle(LED_RED_GPIO_Port, LED_RED_Pin);
+        count = 0;
+      }
     }
   }
   /* USER CODE END TIM8_UP_TIM13_IRQn 0 */

@@ -16,8 +16,8 @@ FILE __stdout;
 
 extern UART_HandleTypeDef huart2;
 
-static uint8_t txBuffer[TX_BUFFER_SIZE];
-static uint8_t rxBuffer[RX_BUFFER_SIZE];
+static uint8_t txBuffer[TX_BUFFER_SIZE+100];
+static uint8_t rxBuffer[RX_BUFFER_SIZE+100];
 
 
 static volatile int32_t syncLock;
@@ -109,7 +109,7 @@ int fputc(int ch, FILE *f) {
 }
 
 #include <stdarg.h>
-char usr_print_buf[1024];
+char usr_print_buf[2048];
 void kprintf(char *str, ...)
 {
   va_list pArgs; //处理后面的三个点

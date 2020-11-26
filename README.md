@@ -69,8 +69,8 @@ where
 
 read/write params (supported by all commands):
 
-    .targetPostion    (default: 0)      - where motor should go, may be udated at ANY time
-    .currentPostion   (default: 0)      - where the motor now, may be updated when motor is STOPPED
+    .targetPosition    (default: 0)      - where motor should go, may be udated at ANY time
+    .currentPosition   (default: 0)      - where the motor now, may be updated when motor is STOPPED
     .minSPS           (default: 1)      - minimum/starting speed (steps-per-second), may be updated when motor is STOPPED
     .maxSPS           (default: 400000) - maximum speed (steps-per-second), may be updated when motor is STOPPED
 
@@ -141,7 +141,7 @@ where
       
       OK - Z.TARGETPOSITION = 7052800
       
-  If motor was STOPPED - it will start rotating. And it will stop when ***currentPosition** will become equal to **targetPostion**.
+  If motor was STOPPED - it will start rotating. And it will stop when ***currentPosition** will become equal to **targetPosition**.
   
   -------------------------------------------
   

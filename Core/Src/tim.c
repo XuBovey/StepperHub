@@ -21,6 +21,7 @@
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
+#include "serial.h"
 
 /* USER CODE END 0 */
 
@@ -417,6 +418,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 /* USER CODE BEGIN 1 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
+  static int count = 0;
   if(htim->Instance==TIM5)
   {
     Stepper_ExecuteAllControllers();
@@ -424,7 +426,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     
     input_scan();
     
-    led_toggle(LED_YEL_GPIO_Port, LED_YEL_Pin);
+    if (count ++ > 100)
+    {
+      count = 0;
+      led_toggle(LED_GRN_GPIO_Port, LED_YEL_Pin);
+    }
   }
 }
 

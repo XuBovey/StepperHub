@@ -1,7 +1,7 @@
 #include <string.h>
 #include "stepperCommands.h"
 #include "stepperController.h"
-// #include "serial.h"
+#include "serial.h"
 
 /*
 REQUEST STRUCTURE
@@ -18,8 +18,8 @@ REQUEST STRUCTURE
     
                         read/write params (supported by all commands):
                         
-                                .targetPostion
-                                .currentPostion 
+                                .targetPosition
+                                .currentPosition 
                                 .minSPS 
                                 .maxSPS
 
@@ -68,7 +68,7 @@ EXAMPLES
               setY:325
                 - command    = set
                 - stepper    = Y
-                - parameter  = targetPostion
+                - parameter  = targetPosition
                 - value      = 325
     RESPONSE
               OK - Y.targetPosition:325
@@ -86,10 +86,10 @@ EXAMPLES
               getZ
                 - command    = get
                 - stepper    = Z
-                - parameter  = currentPostion
+                - parameter  = currentPosition
                 - value      = N/A
     RESPONSE
-              OK - Z.currentPostion:-198496
+              OK - Z.currentPosition:-198496
   -------------------------------------------
     REQUEST  
               getZ.minSPS:4894
@@ -113,7 +113,7 @@ EXAMPLES
               .minSPS:10
               .maxSPS:4000
               .currentSPS:525
-              .currentPostion:2000
+              .currentPosition:2000
               .targetPosition:-150
               .status:1(RUNNING_BACKWARD)
               
