@@ -101,12 +101,13 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  // MX_USB_DEVICE_Init();
+  MX_USB_DEVICE_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM8_Init();
   MX_USART2_UART_Init();
   MX_TIM5_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 
   STEP_TIMER_CLOCK = HAL_RCC_GetHCLKFreq() / 2;
@@ -157,10 +158,12 @@ int main(void)
   stReq.stepper = 'Z';
   ExecuteRequest(&stReq);
 
+#ifdef CHESS
   // kprintf("\r\nEnable all stepper!\r\n\r\n");
   Stepper_SetEn('X', 0);
   Stepper_SetEn('Y', 0);
   Stepper_SetEn('Z', 0);
+#endif
 
   Pump_SetEn(1);
 

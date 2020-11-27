@@ -70,6 +70,8 @@ void Error_Handler(void);
 #define Y_EN_GPIO_Port GPIOA
 #define X_STEP_Pin GPIO_PIN_7
 #define X_STEP_GPIO_Port GPIOA
+#define PUMP_SW_Pin GPIO_PIN_5
+#define PUMP_SW_GPIO_Port GPIOC
 #define X_DIR_Pin GPIO_PIN_10
 #define X_DIR_GPIO_Port GPIOB
 #define X_EN_Pin GPIO_PIN_11
@@ -96,10 +98,8 @@ void Error_Handler(void);
 #define Z_DIR_GPIO_Port GPIOB
 #define Z_EN_Pin GPIO_PIN_7
 #define Z_EN_GPIO_Port GPIOB
-#define PUMP_SW_Pin GPIO_PIN_8
-#define PUMP_SW_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-
+#define CHESS
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
