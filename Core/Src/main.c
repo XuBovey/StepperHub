@@ -42,6 +42,8 @@
 #define Y_TIM_CH  TIM_CHANNEL_1
 #define Z_TIM     htim1
 #define Z_TIM_CH  TIM_CHANNEL_1
+#define L_TIM     htim13
+#define L_TIM_CH  TIM_CHANNEL_1
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -108,13 +110,14 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM5_Init();
   MX_TIM10_Init();
+  MX_TIM13_Init();
   /* USER CODE BEGIN 2 */
 
   STEP_TIMER_CLOCK = HAL_RCC_GetHCLKFreq() / 2;
   STEP_CONTROLLER_PERIOD_US =  1000000U /(STEP_TIMER_CLOCK / htim5.Init.Period);
   
   HAL_Delay(1);
-#if 0
+#if 1
   kprintf("\r\n");
   kprintf ("========= Stepper Hub for STM32F405 ==========\r\n");
   kprintf ("  Timer Clock: %ld MHz StepperCtrl: %ld us\r\n", STEP_TIMER_CLOCK/1000000, STEP_CONTROLLER_PERIOD_US);
@@ -127,6 +130,7 @@ int main(void)
   Stepper_SetupPeripherals('X', &X_TIM, X_TIM_CH, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, X_DIR_GPIO_Port, X_DIR_Pin);
   Stepper_SetupPeripherals('Y', &Y_TIM, Y_TIM_CH, &HAL_TIM_PWM_Start, &HAL_TIM_PWM_Stop, Y_DIR_GPIO_Port, Y_DIR_Pin);
   Stepper_SetupPeripherals('Z', &Z_TIM, Z_TIM_CH, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, Z_DIR_GPIO_Port, Z_DIR_Pin);
+  // Stepper_SetupPeripherals('L', &L_TIM, L_TIM_CH, &HAL_TIM_PWM_Start, &HAL_TIM_PWM_Stop, L_DIR_GPIO_Port, L_DIR_Pin);
   
   // kprintf("Reading settings from internal storage...\r\n");
   Stepper_LoadConfig();
@@ -136,6 +140,7 @@ int main(void)
     Stepper_InitDefaultState('X');
     Stepper_InitDefaultState('Y');
     Stepper_InitDefaultState('Z');
+    // Stepper_InitDefaultState('L');
     Stepper_SaveConfig();
   } 
   // kprintf("DONE!\r\n\r\n");
@@ -143,6 +148,7 @@ int main(void)
   __HAL_TIM_ENABLE_IT(&X_TIM, TIM_IT_UPDATE);
   __HAL_TIM_ENABLE_IT(&Y_TIM, TIM_IT_UPDATE);
   __HAL_TIM_ENABLE_IT(&Z_TIM, TIM_IT_UPDATE);
+  // __HAL_TIM_ENABLE_IT(&L_TIM, TIM_IT_UPDATE);
 
   Serial_InitRxSequence();
 
@@ -157,6 +163,8 @@ int main(void)
   ExecuteRequest(&stReq);
   stReq.stepper = 'Z';
   ExecuteRequest(&stReq);
+  stReq.stepper = 'L';
+  // ExecuteRequest(&stReq);
 
 #ifdef CHESS
   // kprintf("\r\nEnable all stepper!\r\n\r\n");

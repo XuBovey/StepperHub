@@ -438,10 +438,16 @@ stepper_error Stepper_SetAccPrescaler(char stepperName, int32_t value){
   return SERR_MUSTBESTOPPED;
 }
 
+#ifdef CHESS
 int32_t Stepper_SetEn(char stepperName, int32_t value){
   setStepperEn(stepperName, (uint8_t)value);
   return SERR_OK;
 }
+#else
+int32_t Stepper_SetEn(char stepperName, int32_t value){
+  return SERR_OK;
+}
+#endif
 
 int32_t Pump_SetEn(int32_t value){
   setPumpEn((uint8_t)value);

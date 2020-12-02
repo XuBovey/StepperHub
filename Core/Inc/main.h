@@ -66,16 +66,14 @@ void Error_Handler(void);
 #define Y_DIR_GPIO_Port GPIOA
 #define Y_STEP_Pin GPIO_PIN_5
 #define Y_STEP_GPIO_Port GPIOA
-#define Y_EN_Pin GPIO_PIN_6
-#define Y_EN_GPIO_Port GPIOA
 #define X_STEP_Pin GPIO_PIN_7
 #define X_STEP_GPIO_Port GPIOA
 #define PUMP_SW_Pin GPIO_PIN_5
 #define PUMP_SW_GPIO_Port GPIOC
 #define X_DIR_Pin GPIO_PIN_10
 #define X_DIR_GPIO_Port GPIOB
-#define X_EN_Pin GPIO_PIN_11
-#define X_EN_GPIO_Port GPIOB
+#define L_DIR_Pin GPIO_PIN_11
+#define L_DIR_GPIO_Port GPIOB
 #define Y_LIMIT_Pin GPIO_PIN_12
 #define Y_LIMIT_GPIO_Port GPIOB
 #define Z_STEP_Pin GPIO_PIN_13
@@ -96,10 +94,10 @@ void Error_Handler(void);
 #define LED_BLU_GPIO_Port GPIOB
 #define Z_DIR_Pin GPIO_PIN_6
 #define Z_DIR_GPIO_Port GPIOB
-#define Z_EN_Pin GPIO_PIN_7
-#define Z_EN_GPIO_Port GPIOB
+#define L_LIMIT_Pin GPIO_PIN_7
+#define L_LIMIT_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-#define CHESS
+// #define CHESS
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
