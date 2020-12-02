@@ -124,23 +124,24 @@ int main(void)
   kprintf ("  X Step:PA7  Tim:8 Ch:1N Dir: PB10 En: none\r\n");
   kprintf ("  Y Step:PA5  Tim:2 Ch:1  Dir: PA4  En: none\r\n");
   kprintf ("  Z Step:PB13 Tim:1 Ch:1N Dir: PB12 En: none\r\n");
+  kprintf ("  L Step:PA6 Tim:13 Ch:1 Dir: PB11 En: none\r\n");
   kprintf ("==============================================\r\n");
   kprintf("\r\n");
 #endif
   Stepper_SetupPeripherals('X', &X_TIM, X_TIM_CH, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, X_DIR_GPIO_Port, X_DIR_Pin);
   Stepper_SetupPeripherals('Y', &Y_TIM, Y_TIM_CH, &HAL_TIM_PWM_Start, &HAL_TIM_PWM_Stop, Y_DIR_GPIO_Port, Y_DIR_Pin);
   Stepper_SetupPeripherals('Z', &Z_TIM, Z_TIM_CH, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, Z_DIR_GPIO_Port, Z_DIR_Pin);
-  // Stepper_SetupPeripherals('L', &L_TIM, L_TIM_CH, &HAL_TIM_PWM_Start, &HAL_TIM_PWM_Stop, L_DIR_GPIO_Port, L_DIR_Pin);
+   Stepper_SetupPeripherals('L', &L_TIM, L_TIM_CH, &HAL_TIM_PWM_Start, &HAL_TIM_PWM_Stop, L_DIR_GPIO_Port, L_DIR_Pin);
   
   // kprintf("Reading settings from internal storage...\r\n");
   Stepper_LoadConfig();
 
-  if (Stepper_GetAccPrescaler('Z') == 0xFFFFFFFF) {
+  if (Stepper_GetAccPrescaler('L') == 0xFFFFFFFF) {
     // kprintf("Storage is clean, initializing defaults ...\r\n");
     Stepper_InitDefaultState('X');
     Stepper_InitDefaultState('Y');
     Stepper_InitDefaultState('Z');
-    // Stepper_InitDefaultState('L');
+    Stepper_InitDefaultState('L');
     Stepper_SaveConfig();
   } 
   // kprintf("DONE!\r\n\r\n");
@@ -148,7 +149,7 @@ int main(void)
   __HAL_TIM_ENABLE_IT(&X_TIM, TIM_IT_UPDATE);
   __HAL_TIM_ENABLE_IT(&Y_TIM, TIM_IT_UPDATE);
   __HAL_TIM_ENABLE_IT(&Z_TIM, TIM_IT_UPDATE);
-  // __HAL_TIM_ENABLE_IT(&L_TIM, TIM_IT_UPDATE);
+  __HAL_TIM_ENABLE_IT(&L_TIM, TIM_IT_UPDATE);
 
   Serial_InitRxSequence();
 

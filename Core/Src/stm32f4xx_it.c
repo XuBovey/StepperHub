@@ -327,6 +327,15 @@ void TIM8_UP_TIM13_IRQHandler(void)
       }
     }
   }
+
+  if (__HAL_TIM_GET_FLAG(&htim13, TIM_FLAG_UPDATE))
+  {
+    if (__HAL_TIM_GET_ITSTATUS(&htim13, TIM_IT_UPDATE))
+    {
+      __HAL_TIM_CLEAR_FLAG(&htim13, TIM_FLAG_UPDATE);
+      Stepper_PulseTimerUpdate('L');
+    }
+  }
   /* USER CODE END TIM8_UP_TIM13_IRQn 0 */
   /* USER CODE BEGIN TIM8_UP_TIM13_IRQn 1 */
 
