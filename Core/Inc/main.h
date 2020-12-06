@@ -37,7 +37,12 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+typedef struct
+{
+  char name;
+  TIM_HandleTypeDef * tim;
+  int tim_ch;
+}_moto;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -97,7 +102,8 @@ void Error_Handler(void);
 #define L_LIMIT_Pin GPIO_PIN_7
 #define L_LIMIT_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-// #define CHESS
+// #define MOTO_EN_USED
+#define MOTO_LINE
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

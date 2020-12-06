@@ -21,6 +21,8 @@
 #include "gpio.h"
 /* USER CODE BEGIN 0 */
 #include "stepperController.h"
+
+extern _moto motoTable[];
 /* USER CODE END 0 */
 
 /*----------------------------------------------------------------------------*/
@@ -122,7 +124,7 @@ void led_off(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
   HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET);
 }
 
-#ifdef CHESS
+#ifdef MOTO_EN_USED
 void setStepperEn(char stepper, uint8_t value)
 {
   uint8_t state;
@@ -134,11 +136,11 @@ void setStepperEn(char stepper, uint8_t value)
 
   switch (stepper)
   {
-  case 'X': HAL_GPIO_WritePin(X_EN_GPIO_Port, X_EN_Pin, state); break;
-  case 'Y': HAL_GPIO_WritePin(Y_EN_GPIO_Port, Y_EN_Pin, state); break;
-  case 'Z': HAL_GPIO_WritePin(Z_EN_GPIO_Port, Z_EN_Pin, state); break;
-  default:
-    break;
+    case 'X': HAL_GPIO_WritePin(X_EN_GPIO_Port, X_EN_Pin, state); break;
+    case 'Y': HAL_GPIO_WritePin(Y_EN_GPIO_Port, Y_EN_Pin, state); break;
+    case 'Z': HAL_GPIO_WritePin(Z_EN_GPIO_Port, Z_EN_Pin, state); break;
+    default:
+      break;
   }
 }
 #endif
@@ -155,53 +157,74 @@ void input_scan(void){
   static uint8_t x_limitLastState = 1;
   static uint8_t y_limitLastState = 1;
   static uint8_t z_limitLastState = 1;
+  static uint8_t l_limitLastState = 1;
 
   int32_t currentPosition;
   int32_t targetPosition;
+  int i;
 
   uint8_t x_limitCurrentState = HAL_GPIO_ReadPin(X_LIMIT_GPIO_Port, X_LIMIT_Pin);
   uint8_t y_limitCurrentState = HAL_GPIO_ReadPin(Y_LIMIT_GPIO_Port, Y_LIMIT_Pin);
   uint8_t z_limitCurrentState = HAL_GPIO_ReadPin(Z_LIMIT_GPIO_Port, Z_LIMIT_Pin);
+  uint8_t l_limitCurrentState = HAL_GPIO_ReadPin(L_LIMIT_GPIO_Port, L_LIMIT_Pin);
   
+  i = 0;
   if (x_limitCurrentState != x_limitLastState){ // 边沿触发
     x_limitLastState = x_limitCurrentState;
     if (x_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
-      // 设置目标位置为当前位置，使电机停�????
-      targetPosition = Stepper_GetTargetPosition('X');
-      currentPosition = Stepper_GetCurrentPosition('X');
+      // 设置目标位置为当前位置，使电机停�????
+      targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
+      currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
 
       if (targetPosition != currentPosition){
-        Stepper_SetTargetPosition('X', Stepper_GetCurrentPosition('X'));
+        Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
       }
       // kprintf("X limit switch close, stop.\r\n");
     }
   }
 
+  i += 1;
   if (y_limitCurrentState != y_limitLastState){ // 边沿触发
     y_limitLastState = y_limitCurrentState;
     if (y_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
-      // 设置目标位置为当前位置，使电机停�????
-      targetPosition = Stepper_GetTargetPosition('Y');
-      currentPosition = Stepper_GetCurrentPosition('Y');
+      // 设置目标位置为当前位置，使电机停�????
+      targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
+      currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
 
       if (targetPosition != currentPosition){
-        Stepper_SetTargetPosition('Y', Stepper_GetCurrentPosition('Y'));
+        Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
       }
       // kprintf("Y limit switch close, stop.\r\n");
     }
   }
 
+  i += 1;
   if (z_limitCurrentState != z_limitLastState){ // 边沿触发
     z_limitLastState = z_limitCurrentState;
     if (z_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
-      // 设置目标位置为当前位置，使电机停�????
-      targetPosition = Stepper_GetTargetPosition('Z');
-      currentPosition = Stepper_GetCurrentPosition('Z');
+      // 设置目标位置为当前位置，使电机停�????
+      targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
+      currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
 
       if (targetPosition != currentPosition){
-        Stepper_SetTargetPosition('Z', Stepper_GetCurrentPosition('Z'));
+        Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
       }
       // kprintf("Z limit switch close, stop.\r\n");
+    }
+  }
+
+  i += 1;
+  if (l_limitCurrentState != l_limitLastState){ // 边沿触发
+    l_limitLastState = l_limitCurrentState;
+    if (l_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
+      // 设置目标位置为当前位置，使电机停�????
+      targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
+      currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
+
+      if (targetPosition != currentPosition){
+        Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
+      }
+      // kprintf("L limit switch close, stop.\r\n");
     }
   }
 }

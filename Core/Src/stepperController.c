@@ -438,7 +438,7 @@ stepper_error Stepper_SetAccPrescaler(char stepperName, int32_t value){
   return SERR_MUSTBESTOPPED;
 }
 
-#ifdef CHESS
+#ifdef MOTO_EN_USED
 int32_t Stepper_SetEn(char stepperName, int32_t value){
   setStepperEn(stepperName, (uint8_t)value);
   return SERR_OK;

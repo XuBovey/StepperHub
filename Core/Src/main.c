@@ -36,6 +36,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+
 #define X_TIM     htim8
 #define X_TIM_CH  TIM_CHANNEL_1
 #define Y_TIM     htim2
@@ -44,6 +45,30 @@
 #define Z_TIM_CH  TIM_CHANNEL_1
 #define L_TIM     htim13
 #define L_TIM_CH  TIM_CHANNEL_1
+
+extern TIM_HandleTypeDef htim1;
+extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim8;
+#ifdef  MOTO_LINE
+extern TIM_HandleTypeDef htim13;
+#endif
+
+#ifdef  MOTO_LINE
+#define MOTO_MAX 4
+_moto motoTable[] = {
+  {'N', &htim8, TIM_CHANNEL_1},
+  {'M', &htim2, TIM_CHANNEL_1},
+  {'O', &htim1, TIM_CHANNEL_1},
+  {'L', &htim13, TIM_CHANNEL_1},
+};
+#else
+#define MOTO_MAX 3
+_moto motoTable[] = {
+  {'X', &htim8, TIM_CHANNEL_1},
+  {'Y', &htim2, TIM_CHANNEL_1},
+  {'Z', &htim1, TIM_CHANNEL_1},
+};
+#endif
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -81,6 +106,7 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+  int i;
   stepper_request stReq =  {'\0', CMD_GET, PARAM_ALL, 0, false};
   /* USER CODE END 1 */
 
@@ -121,67 +147,62 @@ int main(void)
   kprintf("\r\n");
   kprintf ("========= Stepper Hub for STM32F405 ==========\r\n");
   kprintf ("  Timer Clock: %ld MHz StepperCtrl: %ld us\r\n", STEP_TIMER_CLOCK/1000000, STEP_CONTROLLER_PERIOD_US);
-  kprintf ("  X Step:PA7  Tim:8 Ch:1N Dir: PB10 En: none\r\n");
-  kprintf ("  Y Step:PA5  Tim:2 Ch:1  Dir: PA4  En: none\r\n");
-  kprintf ("  Z Step:PB13 Tim:1 Ch:1N Dir: PB12 En: none\r\n");
+  kprintf ("  X/M Step:PA7  Tim:8 Ch:1N Dir: PB10 En: none\r\n");
+  kprintf ("  Y/N Step:PA5  Tim:2 Ch:1  Dir: PA4  En: none\r\n");
+  kprintf ("  Z/O Step:PB13 Tim:1 Ch:1N Dir: PB12 En: none\r\n");
   kprintf ("  L Step:PA6 Tim:13 Ch:1 Dir: PB11 En: none\r\n");
   kprintf ("==============================================\r\n");
   kprintf("\r\n");
 #endif
-  Stepper_SetupPeripherals('X', &X_TIM, X_TIM_CH, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, X_DIR_GPIO_Port, X_DIR_Pin);
-  Stepper_SetupPeripherals('Y', &Y_TIM, Y_TIM_CH, &HAL_TIM_PWM_Start, &HAL_TIM_PWM_Stop, Y_DIR_GPIO_Port, Y_DIR_Pin);
-  Stepper_SetupPeripherals('Z', &Z_TIM, Z_TIM_CH, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, Z_DIR_GPIO_Port, Z_DIR_Pin);
-   Stepper_SetupPeripherals('L', &L_TIM, L_TIM_CH, &HAL_TIM_PWM_Start, &HAL_TIM_PWM_Stop, L_DIR_GPIO_Port, L_DIR_Pin);
-  
+
+  Stepper_SetupPeripherals(motoTable[0].name, motoTable[0].tim, motoTable[0].tim_ch, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, X_DIR_GPIO_Port, X_DIR_Pin);
+  Stepper_SetupPeripherals(motoTable[1].name, motoTable[1].tim, motoTable[1].tim_ch, &HAL_TIM_PWM_Start,    &HAL_TIM_PWM_Stop,    Y_DIR_GPIO_Port, Y_DIR_Pin);
+  Stepper_SetupPeripherals(motoTable[2].name, motoTable[2].tim, motoTable[2].tim_ch, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, Z_DIR_GPIO_Port, Z_DIR_Pin);
+#ifdef MOTO_LINE
+  Stepper_SetupPeripherals(motoTable[3].name, motoTable[3].tim, motoTable[3].tim_ch, &HAL_TIM_PWM_Start,    &HAL_TIM_PWM_Stop,    L_DIR_GPIO_Port, L_DIR_Pin);
+#endif
   // kprintf("Reading settings from internal storage...\r\n");
   Stepper_LoadConfig();
 
-  if (Stepper_GetAccPrescaler('L') == 0xFFFFFFFF) {
+  if (Stepper_GetAccPrescaler(motoTable[MOTO_MAX-1].name) == 0xFFFFFFFF) {
     // kprintf("Storage is clean, initializing defaults ...\r\n");
-    Stepper_InitDefaultState('X');
-    Stepper_InitDefaultState('Y');
-    Stepper_InitDefaultState('Z');
-    Stepper_InitDefaultState('L');
+    for (i=0; i < MOTO_MAX; i ++)
+    {
+      Stepper_InitDefaultState(motoTable[i].name);
+    }
     Stepper_SaveConfig();
-  } 
-  // kprintf("DONE!\r\n\r\n");
+  }
 
-  __HAL_TIM_ENABLE_IT(&X_TIM, TIM_IT_UPDATE);
-  __HAL_TIM_ENABLE_IT(&Y_TIM, TIM_IT_UPDATE);
-  __HAL_TIM_ENABLE_IT(&Z_TIM, TIM_IT_UPDATE);
-  __HAL_TIM_ENABLE_IT(&L_TIM, TIM_IT_UPDATE);
+  for (i=0; i < MOTO_MAX; i++)
+  {
+    __HAL_TIM_ENABLE_IT(motoTable[i].tim, TIM_IT_UPDATE);
+  }
 
   Serial_InitRxSequence();
 
   HAL_Delay(100);
   // This will run our StepController timer and enable interrupt for it as well
   HAL_TIM_Base_Start_IT(&htim5);
-  
-  // TODO: load settingsfrom FLASH
-  stReq.stepper = 'X';
-  ExecuteRequest(&stReq);
-  stReq.stepper = 'Y';
-  ExecuteRequest(&stReq);
-  stReq.stepper = 'Z';
-  ExecuteRequest(&stReq);
-  stReq.stepper = 'L';
-  // ExecuteRequest(&stReq);
 
-#ifdef CHESS
-  // kprintf("\r\nEnable all stepper!\r\n\r\n");
-  Stepper_SetEn('X', 0);
-  Stepper_SetEn('Y', 0);
-  Stepper_SetEn('Z', 0);
+  // TODO: load settingsfrom FLASH
+  for (i=0; i < MOTO_MAX; i++)
+  {
+    stReq.stepper = motoTable[i].name;
+    ExecuteRequest(&stReq);
+  }
+
+#ifdef MOTO_EN_USED
+  for (i=0; i < MOTO_MAX; i++)
+  {
+    Stepper_SetEn(motoTable[0].name, 0);
+  }
 #endif
 
   Pump_SetEn(1);
 
 #if defined (TEST) 
-
-  Stepper_SetTargetPosition('X',100);
-
+  Stepper_SetTargetPosition(motoTable[0].name,100);
 #endif
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
