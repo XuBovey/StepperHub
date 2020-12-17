@@ -216,15 +216,17 @@ void input_scan(void){
   i += 1;
   if (l_limitCurrentState != l_limitLastState){ // 边沿触发
     l_limitLastState = l_limitCurrentState;
-    if (l_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
+    if (l_limitCurrentState == GPIO_PIN_RESET){   // 高电平表示下降沿
       // 设置目标位置为当前位置，使电机停�????
+#if 0
       targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
       currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
 
       if (targetPosition != currentPosition){
         Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
       }
-      // kprintf("L limit switch close, stop.\r\n");
+#endif
+      kprintf("limited %c.stop \r\n", motoTable[i].name);
     }
   }
 }
