@@ -4,7 +4,7 @@
 #include "serial.h"
 #include "gpio.h"
 
-static stepper_state steppers[MAX_STEPPERS_COUNT];
+static stepper_state steppers[MAM0_STEPPERS_COUNT];
 static int32_t initializedSteppersCount;
 
 void SetAccelerationByMinSPS(stepper_state * stepper) {
@@ -108,7 +108,7 @@ stepper_error Stepper_SetupPeripherals(
     // Find existing or init new.
     stepper_state * stepper = GetState(stepperName);
     if (stepper == NULL) {
-        if (initializedSteppersCount == MAX_STEPPERS_COUNT) return SERR_NOMORESTATESAVAILABLE;
+        if (initializedSteppersCount == MAM0_STEPPERS_COUNT) return SERR_NOMORESTATESAVAILABLE;
         stepper = &steppers[initializedSteppersCount++];
         stepper -> name = stepperName;
         stepper -> status = SS_STOPPED;
@@ -136,7 +136,7 @@ stepper_error Stepper_InitDefaultState(char stepperName) {
     // Find existing or init new.
     stepper_state * stepper = GetState(stepperName);
     if (stepper == NULL) {
-        if (initializedSteppersCount == MAX_STEPPERS_COUNT) return SERR_NOMORESTATESAVAILABLE;
+        if (initializedSteppersCount == MAM0_STEPPERS_COUNT) return SERR_NOMORESTATESAVAILABLE;
         stepper = &steppers[initializedSteppersCount++];
         stepper -> name = stepperName;
         stepper -> status = SS_STOPPED;

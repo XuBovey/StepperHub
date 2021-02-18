@@ -32,17 +32,11 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "common.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-typedef struct
-{
-  char name;
-  TIM_HandleTypeDef * tim;
-  int tim_ch;
-}_moto;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -67,26 +61,28 @@ void Error_Handler(void);
 #define UART_TX_GPIO_Port GPIOA
 #define UART_RX_Pin GPIO_PIN_3
 #define UART_RX_GPIO_Port GPIOA
-#define Y_DIR_Pin GPIO_PIN_4
-#define Y_DIR_GPIO_Port GPIOA
-#define Y_STEP_Pin GPIO_PIN_5
-#define Y_STEP_GPIO_Port GPIOA
-#define X_STEP_Pin GPIO_PIN_7
-#define X_STEP_GPIO_Port GPIOA
+#define M1_DIR_Pin GPIO_PIN_4
+#define M1_DIR_GPIO_Port GPIOA
+#define M1_STEP_Pin GPIO_PIN_5
+#define M1_STEP_GPIO_Port GPIOA
+#define M3_STEP_Pin GPIO_PIN_6
+#define M3_STEP_GPIO_Port GPIOA
+#define M0_STEP_Pin GPIO_PIN_7
+#define M0_STEP_GPIO_Port GPIOA
 #define PUMP_SW_Pin GPIO_PIN_5
 #define PUMP_SW_GPIO_Port GPIOC
-#define X_DIR_Pin GPIO_PIN_10
-#define X_DIR_GPIO_Port GPIOB
-#define L_DIR_Pin GPIO_PIN_11
-#define L_DIR_GPIO_Port GPIOB
-#define Y_LIMIT_Pin GPIO_PIN_12
-#define Y_LIMIT_GPIO_Port GPIOB
-#define Z_STEP_Pin GPIO_PIN_13
-#define Z_STEP_GPIO_Port GPIOB
-#define X_LIMIT_Pin GPIO_PIN_14
-#define X_LIMIT_GPIO_Port GPIOB
-#define Z_LIMIT_Pin GPIO_PIN_15
-#define Z_LIMIT_GPIO_Port GPIOB
+#define M0_DIR_Pin GPIO_PIN_10
+#define M0_DIR_GPIO_Port GPIOB
+#define M3_DIR_Pin GPIO_PIN_11
+#define M3_DIR_GPIO_Port GPIOB
+#define M1_LIMIT_Pin GPIO_PIN_12
+#define M1_LIMIT_GPIO_Port GPIOB
+#define M2_STEP_Pin GPIO_PIN_13
+#define M2_STEP_GPIO_Port GPIOB
+#define M0_LIMIT_Pin GPIO_PIN_14
+#define M0_LIMIT_GPIO_Port GPIOB
+#define M2_LIMIT_Pin GPIO_PIN_15
+#define M2_LIMIT_GPIO_Port GPIOB
 #define LED_RED_Pin GPIO_PIN_13
 #define LED_RED_GPIO_Port GPIOA
 #define LED_GRN_Pin GPIO_PIN_14
@@ -97,13 +93,14 @@ void Error_Handler(void);
 #define SW_USR_GPIO_Port GPIOB
 #define LED_BLU_Pin GPIO_PIN_4
 #define LED_BLU_GPIO_Port GPIOB
-#define Z_DIR_Pin GPIO_PIN_6
-#define Z_DIR_GPIO_Port GPIOB
-#define L_LIMIT_Pin GPIO_PIN_7
-#define L_LIMIT_GPIO_Port GPIOB
+#define M2_DIR_Pin GPIO_PIN_6
+#define M2_DIR_GPIO_Port GPIOB
+#define M3_LIMIT_Pin GPIO_PIN_7
+#define M3_LIMIT_GPIO_Port GPIOB
+#define M4_ANGLE_Pin GPIO_PIN_8
+#define M4_ANGLE_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-// #define MOTO_EN_USED
-#define MOTO_LINE
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

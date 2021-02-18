@@ -8,7 +8,7 @@
 // We user the last small 128kB FLASH_SECTOR_11 to store the config data.
 
 #define ADDR_FLASH_SECTOR_11     ((uint32_t)0x080e0000)
-#define MAX_STEPPERS_COUNT       10
+#define MAM0_STEPPERS_COUNT       10
 #define ACCSPS_TO_MINSPS_RATIO   0.8f
 #define DEFAULT_MIN_SPS 1
 #define DEFAULT_MAX_SPS 400000

@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -23,6 +23,7 @@
 #include "stepperController.h"
 
 extern _moto motoTable[];
+extern _moto_limited moto_limited_io[];
 /* USER CODE END 0 */
 
 /*----------------------------------------------------------------------------*/
@@ -51,20 +52,20 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, Y_DIR_Pin|LED_RED_Pin|LED_GRN_Pin|LED_YEL_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, M1_DIR_Pin|LED_RED_Pin|LED_GRN_Pin|LED_YEL_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(PUMP_SW_GPIO_Port, PUMP_SW_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, X_DIR_Pin|L_DIR_Pin|LED_BLU_Pin|Z_DIR_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, M0_DIR_Pin|M3_DIR_Pin|LED_BLU_Pin|M2_DIR_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = Y_DIR_Pin;
+  GPIO_InitStruct.Pin = M1_DIR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(Y_DIR_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(M1_DIR_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = PUMP_SW_Pin;
@@ -74,14 +75,14 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(PUMP_SW_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = X_DIR_Pin|L_DIR_Pin|Z_DIR_Pin;
+  GPIO_InitStruct.Pin = M0_DIR_Pin|M3_DIR_Pin|M2_DIR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin PBPin PBPin */
-  GPIO_InitStruct.Pin = Y_LIMIT_Pin|X_LIMIT_Pin|Z_LIMIT_Pin|L_LIMIT_Pin;
+  GPIO_InitStruct.Pin = M1_LIMIT_Pin|M0_LIMIT_Pin|M2_LIMIT_Pin|M3_LIMIT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -154,79 +155,25 @@ void setPumpEn(uint8_t value)
 }
 
 void input_scan(void){
-  static uint8_t x_limitLastState = 1;
-  static uint8_t y_limitLastState = 1;
-  static uint8_t z_limitLastState = 1;
-  static uint8_t l_limitLastState = 1;
-
   int32_t currentPosition;
   int32_t targetPosition;
   int i;
 
-  uint8_t x_limitCurrentState = HAL_GPIO_ReadPin(X_LIMIT_GPIO_Port, X_LIMIT_Pin);
-  uint8_t y_limitCurrentState = HAL_GPIO_ReadPin(Y_LIMIT_GPIO_Port, Y_LIMIT_Pin);
-  uint8_t z_limitCurrentState = HAL_GPIO_ReadPin(Z_LIMIT_GPIO_Port, Z_LIMIT_Pin);
-  uint8_t l_limitCurrentState = HAL_GPIO_ReadPin(L_LIMIT_GPIO_Port, L_LIMIT_Pin);
-  
-  i = 0;
-  if (x_limitCurrentState != x_limitLastState){ // 边沿触发
-    x_limitLastState = x_limitCurrentState;
-    if (x_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
-      // 设置目标位置为当前位置，使电机停�????
-      targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
-      currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
+  for(i=0; i < MOTO_MAX; i++){
+    moto_limited_io[i].current_state = HAL_GPIO_ReadPin(moto_limited_io[i].port, moto_limited_io[i].pin);
 
-      if (targetPosition != currentPosition){
-        Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
+    if(moto_limited_io[i].last_state != moto_limited_io[i].current_state){
+      moto_limited_io[i].last_state = moto_limited_io[i].current_state;
+
+      if (moto_limited_io[i].current_state == GPIO_PIN_RESET){
+        targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
+        currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
+
+        if (targetPosition != currentPosition){
+          Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
+        }
+        kprintf("[%d] limited stop.\r\n",i);
       }
-      // kprintf("X limit switch close, stop.\r\n");
-    }
-  }
-
-  i += 1;
-  if (y_limitCurrentState != y_limitLastState){ // 边沿触发
-    y_limitLastState = y_limitCurrentState;
-    if (y_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
-      // 设置目标位置为当前位置，使电机停�????
-      targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
-      currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
-
-      if (targetPosition != currentPosition){
-        Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
-      }
-      // kprintf("Y limit switch close, stop.\r\n");
-    }
-  }
-
-  i += 1;
-  if (z_limitCurrentState != z_limitLastState){ // 边沿触发
-    z_limitLastState = z_limitCurrentState;
-    if (z_limitCurrentState == GPIO_PIN_SET){   // 高电平表示上升沿
-      // 设置目标位置为当前位置，使电机停�????
-      targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
-      currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
-
-      if (targetPosition != currentPosition){
-        Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
-      }
-      // kprintf("Z limit switch close, stop.\r\n");
-    }
-  }
-
-  i += 1;
-  if (l_limitCurrentState != l_limitLastState){ // 边沿触发
-    l_limitLastState = l_limitCurrentState;
-    if (l_limitCurrentState == GPIO_PIN_RESET){   // 高电平表示下降沿
-      // 设置目标位置为当前位置，使电机停�????
-#if 0
-      targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
-      currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
-
-      if (targetPosition != currentPosition){
-        Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
-      }
-#endif
-      kprintf("limited %c.stop \r\n", motoTable[i].name);
     }
   }
 }

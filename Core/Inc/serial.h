@@ -1,4 +1,7 @@
 
+#ifndef __SERIAL_H__
+#define __SERIAL_H__
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -27,3 +30,5 @@ void kprintf(char *str, ...);
 void Serial_InitRxSequence(void);
 void Serial_CheckRxTimeout(void);
 void Serial_RxCallback(uint8_t byte);
+
+#endif // __SERIAL_H__

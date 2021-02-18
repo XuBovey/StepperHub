@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -67,7 +67,7 @@ void MX_TIM1_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 200;
+  sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCNPolarity = TIM_OCNPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
@@ -390,12 +390,12 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     /**TIM1 GPIO Configuration
     PB13     ------> TIM1_CH1N
     */
-    GPIO_InitStruct.Pin = Z_STEP_Pin;
+    GPIO_InitStruct.Pin = M2_STEP_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
-    HAL_GPIO_Init(Z_STEP_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(M2_STEP_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN TIM1_MspPostInit 1 */
 
@@ -411,12 +411,12 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     /**TIM2 GPIO Configuration
     PA5     ------> TIM2_CH1
     */
-    GPIO_InitStruct.Pin = Y_STEP_Pin;
+    GPIO_InitStruct.Pin = M1_STEP_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
-    HAL_GPIO_Init(Y_STEP_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(M1_STEP_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN TIM2_MspPostInit 1 */
 
@@ -432,12 +432,12 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     /**TIM8 GPIO Configuration
     PA7     ------> TIM8_CH1N
     */
-    GPIO_InitStruct.Pin = X_STEP_Pin;
+    GPIO_InitStruct.Pin = M0_STEP_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
-    HAL_GPIO_Init(X_STEP_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(M0_STEP_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN TIM8_MspPostInit 1 */
 
@@ -453,12 +453,12 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     /**TIM10 GPIO Configuration
     PB8     ------> TIM10_CH1
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Pin = M4_ANGLE_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF3_TIM10;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    HAL_GPIO_Init(M4_ANGLE_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN TIM10_MspPostInit 1 */
 
@@ -474,12 +474,12 @@ void HAL_TIM_MspPostInit(TIM_HandleTypeDef* timHandle)
     /**TIM13 GPIO Configuration
     PA6     ------> TIM13_CH1
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_6;
+    GPIO_InitStruct.Pin = M3_STEP_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF9_TIM13;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    HAL_GPIO_Init(M3_STEP_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN TIM13_MspPostInit 1 */
 

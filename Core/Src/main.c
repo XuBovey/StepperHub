@@ -36,43 +36,46 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
-#define X_TIM     htim8
-#define X_TIM_CH  TIM_CHANNEL_1
-#define Y_TIM     htim2
-#define Y_TIM_CH  TIM_CHANNEL_1
-#define Z_TIM     htim1
-#define Z_TIM_CH  TIM_CHANNEL_1
-#define L_TIM     htim13
-#define L_TIM_CH  TIM_CHANNEL_1
-
+#ifdef ARM_ROBOT
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim8;
-#ifdef  MOTO_LINE
+#endif
+
+#ifdef  BELT_ROBOT
 extern TIM_HandleTypeDef htim13;
 #endif
 
-#ifdef  MOTO_LINE
-#define MOTO_MAX 4
-_moto motoTable[] = {
-  {'N', &htim8, TIM_CHANNEL_1},
-  {'M', &htim2, TIM_CHANNEL_1},
-  {'O', &htim1, TIM_CHANNEL_1},
-  {'L', &htim13, TIM_CHANNEL_1},
-};
-#else
-#define MOTO_MAX 3
-_moto motoTable[] = {
-  {'X', &htim8, TIM_CHANNEL_1},
-  {'Y', &htim2, TIM_CHANNEL_1},
-  {'Z', &htim1, TIM_CHANNEL_1},
-};
+_moto motoTable[MOTO_MAX] = {
+#ifdef ARM_ROBOT
+  {'M', &htim8,  TIM_CHANNEL_1}, // M0
+  {'N', &htim2,  TIM_CHANNEL_1}, // M1
+  {'O', &htim1,  TIM_CHANNEL_1}, // M2
 #endif
+
+#ifdef  BELT_ROBOT
+  {'L', &htim13, TIM_CHANNEL_1}, // M3
+#endif
+};
+
+_moto_limited moto_limited_io[MOTO_MAX] = {
+#ifdef ARM_ROBOT
+  {1, 1, M0_LIMIT_GPIO_Port, M0_LIMIT_Pin}, //Y7
+  {1, 1, M1_LIMIT_GPIO_Port, M1_LIMIT_Pin}, //Y5
+  {1, 1, M2_LIMIT_GPIO_Port, M2_LIMIT_Pin}, //Y8
+#endif
+
+#ifdef  BELT_ROBOT
+  {1, 1, M3_LIMIT_GPIO_Port, M3_LIMIT_Pin}, //X10
+#endif
+};
+
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -147,25 +150,30 @@ int main(void)
   kprintf("\r\n");
   kprintf ("========= Stepper Hub for STM32F405 ==========\r\n");
   kprintf ("  Timer Clock: %ld MHz StepperCtrl: %ld us\r\n", STEP_TIMER_CLOCK/1000000, STEP_CONTROLLER_PERIOD_US);
-  kprintf ("  X/M Step:PA7  Tim:8 Ch:1N Dir: PB10 En: none\r\n");
-  kprintf ("  Y/N Step:PA5  Tim:2 Ch:1  Dir: PA4  En: none\r\n");
-  kprintf ("  Z/O Step:PB13 Tim:1 Ch:1N Dir: PB12 En: none\r\n");
-  kprintf ("  L Step:PA6 Tim:13 Ch:1 Dir: PB11 En: none\r\n");
+  kprintf ("  M0 X/M Step:PA7  Tim:8 Ch:1N Dir: PB10 En: none\r\n");
+  kprintf ("  M1 Y/N Step:PA5  Tim:2 Ch:1  Dir: PA4  En: none\r\n");
+  kprintf ("  M2 Z/O Step:PB13 Tim:1 Ch:1N Dir: PB12 En: none\r\n");
+  kprintf ("  M3 L Step:PA6 Tim:13 Ch:1 Dir: PB11 En: none\r\n");
   kprintf ("==============================================\r\n");
-  kprintf("\r\n");
+  kprintf ("%s\r\n",VERSION);
+  kprintf ("\r\n");
 #endif
 
-  Stepper_SetupPeripherals(motoTable[0].name, motoTable[0].tim, motoTable[0].tim_ch, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, X_DIR_GPIO_Port, X_DIR_Pin);
-  Stepper_SetupPeripherals(motoTable[1].name, motoTable[1].tim, motoTable[1].tim_ch, &HAL_TIM_PWM_Start,    &HAL_TIM_PWM_Stop,    Y_DIR_GPIO_Port, Y_DIR_Pin);
-  Stepper_SetupPeripherals(motoTable[2].name, motoTable[2].tim, motoTable[2].tim_ch, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, Z_DIR_GPIO_Port, Z_DIR_Pin);
-#ifdef MOTO_LINE
-  Stepper_SetupPeripherals(motoTable[3].name, motoTable[3].tim, motoTable[3].tim_ch, &HAL_TIM_PWM_Start,    &HAL_TIM_PWM_Stop,    L_DIR_GPIO_Port, L_DIR_Pin);
+#ifdef ARM_ROBOT
+  Stepper_SetupPeripherals(motoTable[0].name, motoTable[0].tim, motoTable[0].tim_ch, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, M0_DIR_GPIO_Port, M0_DIR_Pin);
+  Stepper_SetupPeripherals(motoTable[1].name, motoTable[1].tim, motoTable[1].tim_ch, &HAL_TIM_PWM_Start,    &HAL_TIM_PWM_Stop,    M1_DIR_GPIO_Port, M1_DIR_Pin);
+  Stepper_SetupPeripherals(motoTable[2].name, motoTable[2].tim, motoTable[2].tim_ch, &HAL_TIMEx_PWMN_Start, &HAL_TIMEx_PWMN_Stop, M2_DIR_GPIO_Port, M2_DIR_Pin);
 #endif
-  // kprintf("Reading settings from internal storage...\r\n");
+
+#ifdef BELT_ROBOT
+  Stepper_SetupPeripherals(motoTable[3].name, motoTable[3].tim, motoTable[3].tim_ch, &HAL_TIM_PWM_Start,    &HAL_TIM_PWM_Stop,    M3_DIR_GPIO_Port, M3_DIR_Pin);
+#endif
+
+  kprintf("Reading settings from internal storage...\r\n");
   Stepper_LoadConfig();
 
   if (Stepper_GetAccPrescaler(motoTable[MOTO_MAX-1].name) == 0xFFFFFFFF) {
-    // kprintf("Storage is clean, initializing defaults ...\r\n");
+    kprintf("Storage is clean, initializing defaults ...\r\n");
     for (i=0; i < MOTO_MAX; i ++)
     {
       Stepper_InitDefaultState(motoTable[i].name);
