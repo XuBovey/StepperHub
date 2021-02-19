@@ -252,7 +252,6 @@ void TIM1_UP_TIM10_IRQHandler(void)
     if (__HAL_TIM_GET_ITSTATUS(&htim1, TIM_IT_UPDATE))
     {
       __HAL_TIM_CLEAR_FLAG(&htim1, TIM_FLAG_UPDATE);
-      // Stepper_PulseTimerUpdate('Z');
       Stepper_PulseTimerUpdate(motoTable[2].name);
       if(count ++ > 200)
       {
@@ -279,7 +278,6 @@ void TIM2_IRQHandler(void)
     if (__HAL_TIM_GET_ITSTATUS(&htim2, TIM_IT_UPDATE))
     {
       __HAL_TIM_CLEAR_FLAG(&htim2, TIM_FLAG_UPDATE);
-      // Stepper_PulseTimerUpdate('Y');
       Stepper_PulseTimerUpdate(motoTable[1].name);
       if(count ++ > 200)
       {
@@ -320,7 +318,6 @@ void TIM8_UP_TIM13_IRQHandler(void)
     if (__HAL_TIM_GET_ITSTATUS(&htim8, TIM_IT_UPDATE))
     {
       __HAL_TIM_CLEAR_FLAG(&htim8, TIM_FLAG_UPDATE);
-      // Stepper_PulseTimerUpdate('X');
       Stepper_PulseTimerUpdate(motoTable[0].name);
 
       if(count ++ > 200)
@@ -336,7 +333,6 @@ void TIM8_UP_TIM13_IRQHandler(void)
     if (__HAL_TIM_GET_ITSTATUS(&htim13, TIM_IT_UPDATE))
     {
       __HAL_TIM_CLEAR_FLAG(&htim13, TIM_FLAG_UPDATE);
-      // Stepper_PulseTimerUpdate('L');
       Stepper_PulseTimerUpdate(motoTable[3].name);
     }
   }

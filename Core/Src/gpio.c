@@ -170,9 +170,9 @@ void input_scan(void){
         currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
 
         if (targetPosition != currentPosition){
-          Stepper_SetTargetPosition(motoTable[i].name, Stepper_GetCurrentPosition(motoTable[i].name));
+          Stepper_SetTargetPosition(motoTable[i].name, currentPosition);
         }
-        kprintf("[%d] limited stop.\r\n",i);
+        kprintf("%c:limit postion.\r\n", motoTable[i].name);
       }
     }
   }
