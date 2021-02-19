@@ -180,10 +180,16 @@ void ExecuteController(stepper_state * stepper){
 
   if (status & SS_STOPPED) { 
     if (stepper->targetPosition != stepper->currentPosition) {
-     stepper->stepCtrlPrescallerTicks = stepper->stepCtrlPrescaller;
-     stepper->status = SS_STARTING;
-     stepper->STEP_TIMER->Instance->EGR = TIM_EGR_UG;
-     stepper->start(stepper->STEP_TIMER, stepper->STEP_CHANNEL);
+      if (false == Stepper_LimitedCheck(stepper->name)){
+        stepper->targetPosition = stepper->currentPosition;
+        kprintf("limited %c.stop:%ld\r\n", stepper->name, stepper->currentPosition);
+        return;
+      }
+
+      stepper->stepCtrlPrescallerTicks = stepper->stepCtrlPrescaller;
+      stepper->status = SS_STARTING;
+      stepper->STEP_TIMER->Instance->EGR = TIM_EGR_UG;
+      stepper->start(stepper->STEP_TIMER, stepper->STEP_CHANNEL);
     }
     
     return;
@@ -252,6 +258,38 @@ void ExecuteController(stepper_state * stepper){
   }
 }
 
+void Stepper_LimitedSwitchUpdate(char stepperName, stepper_limitedStatus value){
+  stepper_state * stepper = GetState(stepperName);
+  if (stepper == NULL)
+    return;
+  
+  stepper->limitedState = value;
+}
+
+bool Stepper_LimitedCheck(char stepperName){
+  bool ret = false;
+  stepper_state * stepper = GetState(stepperName);
+  if (stepper == NULL)
+    return ret;
+
+  if (stepper->limitedState == LS_NORMAL){
+    ret = true;
+  }
+  else if (stepper->limitedState == LS_ADD){
+    if(stepper->currentPosition < stepper->targetPosition)
+      ret = false;
+    else
+      ret = true;
+  }
+  else if (stepper->limitedState == LS_SUB){
+    if(stepper->currentPosition > stepper->targetPosition)
+      ret = false;
+    else
+      ret = true;
+  }
+  return ret;
+}
+
 void Stepper_PulseTimerUpdate(char stepperName){
   stepper_state * stepper = GetState(stepperName);
   if (stepper == NULL)
@@ -270,11 +308,12 @@ void Stepper_PulseTimerUpdate(char stepperName){
           stepper->stop(stepper->STEP_TIMER, stepper->STEP_CHANNEL);
           kprintf("start %c.stop:%ld\r\n", stepper->name, stepper->currentPosition);
       }
-      break;   
+      break;
     case SS_RUNNING_FORWARD:
     case SS_RUNNING_BACKWARD:
       // handle stop from limited switch.
-      if (stepper->currentPosition == stepper->targetPosition) {
+      if (false == Stepper_LimitedCheck(stepper->name)){
+          stepper->targetPosition = stepper->currentPosition;
           stepper->status = SS_STOPPED;
           stepper->stop(stepper->STEP_TIMER, stepper->STEP_CHANNEL);
           stepper -> currentSPS = stepper -> minSPS;

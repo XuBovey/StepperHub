@@ -12,7 +12,7 @@ class Pyqt5_Serial(QtWidgets.QWidget, Ui_RobotApp):
         super(Pyqt5_Serial, self).__init__()
         self.setupUi(self)
         self.init()
-        self.setWindowTitle("串口小助手")
+        self.setWindowTitle("kup_robot调试工具")
         self.ser = serial.Serial()
         self.port_check()
 
@@ -107,7 +107,7 @@ class Pyqt5_Serial(QtWidgets.QWidget, Ui_RobotApp):
             return None
 
         # 打开串口接收定时器，周期为2ms
-        self.timer.start(2)
+        self.timer.start(10)
 
         if self.ser.isOpen():
             self.open_button.setEnabled(False)

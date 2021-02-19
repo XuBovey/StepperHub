@@ -611,15 +611,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   static int count = 0;
   if(htim->Instance==TIM5)
   {
+    input_scan();
     Stepper_ExecuteAllControllers();
     Serial_CheckRxTimeout();
-    
-    input_scan();
     
     if (count ++ > 100)
     {
       count = 0;
-      led_toggle(LED_GRN_GPIO_Port, LED_YEL_Pin);
+      led_toggle(LED_YEL_GPIO_Port, LED_YEL_Pin);
     }
   }
 }

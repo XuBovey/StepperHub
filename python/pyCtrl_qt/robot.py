@@ -2,7 +2,6 @@ import sys
 from threading import Thread
 import time
 from robot_arm_ik import robot_arm_ik
-from getchar import getChar
 
 _STEP = 50
 _CMD = 0

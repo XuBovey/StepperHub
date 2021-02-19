@@ -48,9 +48,9 @@ extern TIM_HandleTypeDef htim13;
 
 _moto motoTable[MOTO_MAX] = {
 #ifdef ARM_ROBOT
-  {'M', &htim8,  TIM_CHANNEL_1}, // M0
-  {'N', &htim2,  TIM_CHANNEL_1}, // M1
-  {'O', &htim1,  TIM_CHANNEL_1}, // M2
+  {'M', &htim8,  TIM_CHANNEL_1}, // M0 X8
+  {'N', &htim2,  TIM_CHANNEL_1}, // M1 X6
+  {'O', &htim1,  TIM_CHANNEL_1}, // M2 Y6
 #endif
 
 #ifdef  BELT_ROBOT

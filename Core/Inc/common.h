@@ -4,7 +4,7 @@
 #include "stm32f4xx_hal.h"
 #include "serial.h"
 
-#define VERSION "V0.1.2.02 2021-2-18"
+#define VERSION "V0.1.3.02 2021-2-19"
 
 // #define MOTO_EN_USED
 

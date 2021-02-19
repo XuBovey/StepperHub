@@ -155,25 +155,16 @@ void setPumpEn(uint8_t value)
 }
 
 void input_scan(void){
-  int32_t currentPosition;
-  int32_t targetPosition;
   int i;
 
   for(i=0; i < MOTO_MAX; i++){
-    moto_limited_io[i].current_state = HAL_GPIO_ReadPin(moto_limited_io[i].port, moto_limited_io[i].pin);
-
-    if(moto_limited_io[i].last_state != moto_limited_io[i].current_state){
-      moto_limited_io[i].last_state = moto_limited_io[i].current_state;
-
-      if (moto_limited_io[i].current_state == GPIO_PIN_RESET){
-        targetPosition = Stepper_GetTargetPosition(motoTable[i].name);
-        currentPosition = Stepper_GetCurrentPosition(motoTable[i].name);
-
-        if (targetPosition != currentPosition){
-          Stepper_SetTargetPosition(motoTable[i].name, currentPosition);
-        }
-        kprintf("%c:limit postion.\r\n", motoTable[i].name);
-      }
+    if (moto_limited_io[i].port != NULL){
+      if (HAL_GPIO_ReadPin(moto_limited_io[i].port, moto_limited_io[i].pin) == GPIO_PIN_RESET) //开关闭合
+        Stepper_LimitedSwitchUpdate(motoTable[i].name, LS_ADD);
+      // else if ()// not support
+      //   Stepper_LimitedSwitchUpdate(motoTable[i].name, LS_SUB);
+      else
+        Stepper_LimitedSwitchUpdate(motoTable[i].name, LS_NORMAL);
     }
   }
 }

@@ -1,6 +1,7 @@
 #ifndef _STEPPER_CONTROLLER_H_
 #define _STEPPER_CONTROLLER_H_
 
+#include <stdbool.h>
 #include "stm32f4xx_hal.h"
 #include "main.h"
 #include "gpio.h"
@@ -30,6 +31,12 @@ typedef enum {
     SERR_STATENOTFOUND          = 3,
     SERR_LIMIT                  = 4
 } stepper_error;
+
+typedef enum {
+    LS_NORMAL           = 0,
+    LS_ADD              = 1,
+    LS_SUB              = -1
+} stepper_limitedStatus;
 
 typedef HAL_StatusTypeDef (*funPwmCtrl)(TIM_HandleTypeDef * STEP_TIMER, uint32_t  STEP_CHANNEL);
 
@@ -85,6 +92,10 @@ typedef struct {
 
     // stop fun
     funPwmCtrl stop;
+
+    // limited switch state
+    // 0: no limit, 1:+limit, -1:-limit
+    stepper_limitedStatus limitedState;
 } stepper_state;
 
 extern uint32_t STEP_TIMER_CLOCK;
@@ -180,4 +191,6 @@ void Stepper_SaveConfig(void);
 int32_t Pump_SetEn(int32_t value);
 int32_t Stepper_SetEn(char stepperName, int32_t value);
 void stopAllStepper();
+void Stepper_LimitedSwitchUpdate(char stepperName, stepper_limitedStatus value);
+_Bool Stepper_LimitedCheck(char stepperName);
 #endif //_STEPPER_CONTROLLER_H_
