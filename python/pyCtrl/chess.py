@@ -5,17 +5,19 @@ import serial
 from robot_key_ctrl import ROBOT_KeyCtrl
 # from getchar import getChar
 
-COM_PORT = "COM13"
+COM_PORT = "COM7"
 
 _STEP = 10
 _CMD = 0
 demo_sel = 0
 
+# 棋盘0，0坐标位置
 BOARD_Z_MV_LEN = 18
 BOARD_HOME_X = -55
 BOARD_HOME_Y = -32
 BOARD_HOME_Z = -17
 
+# 棋子0，0左边位置
 CARRY_Z_MV_LEN = 35
 CARRY_HOME_X = -25
 CARRY_HOME_Y = -340
@@ -69,6 +71,10 @@ class Robot():
 
         self._running = True
         self.stateUpdateTime = int(time.time())
+        
+        self.motoNameX = 'M'
+        self.motoNameY = 'N'
+        self.motoNameZ = 'O'
     
     def rxTask(self):
         while True:
@@ -81,18 +87,18 @@ class Robot():
             for str_data in data_list:
                 # print(str_data)
                 if "STOPPED" in str_data: # moveto target stop
-                    if "X.STATUS" in str_data:
+                    if (self.motoNameX+".STATUS") in str_data:
                         self.xState = 0
-                    elif "Y.STATUS" in str_data:
+                    elif (self.motoNameY+".STATUS") in str_data:
                         self.yState = 0
-                    elif "Z.STATUS" in str_data:
+                    elif (self.motoNameZ+".STATUS") in str_data:
                         self.zState = 0
                 elif 'stop' in str_data: # limited stop
-                    if "X.stop" in str_data:
+                    if (self.motoNameX+".stop") in str_data:
                         self.xState = 0
-                    elif "Y.stop" in str_data:
+                    elif (self.motoNameY+".stop") in str_data:
                         self.yState = 0
-                    elif "Z.stop" in str_data:
+                    elif (self.motoNameZ+".stop") in str_data:
                         self.zState = 0
                 elif 'Error' in str_data:
                     print(str_data)
@@ -123,17 +129,17 @@ class Robot():
         self.xState = 1
         self.yState = 1
         self.zState = 1
-        self.cmdSend("setX:{:}setY:{:}setZ:{:}\n".format(xsteps, ysteps, zsteps))
+        self.cmdSend("set{:}:{:}set{:}:{:}set{:}:{:}\n".format(self.motoNameX, xsteps, self.motoNameY, ysteps, self.motoNameZ, zsteps))
         self.waitStop()
 
         # self.xState = 1
-        # self.cmdSend("setX:{:}\n".format(xsteps))
+        # self.cmdSend("set{:}:{:}\n".format(self.motoNameX, xsteps))
         # self.waitStop()
         # self.yState = 1
-        # self.cmdSend("setY:{:}\n".format(ysteps))
+        # self.cmdSend("set{:}:{:}\n".format(self.motoNameY, ysteps))
         # self.waitStop()
         # self.zState = 1
-        # self.cmdSend("setZ:{:}\n".format(zsteps))
+        # self.cmdSend("set{:}:{:}\n".format(self.motoNameZ, zsteps))
         # self.waitStop()
 
     def mvPostion(self, xyz):
@@ -141,22 +147,22 @@ class Robot():
         self.xState = 1
         self.yState = 1
         self.zState = 1
-        self.cmdSend("addX:{:}addY:{:}addZ:{:}\n".format(xsteps, ysteps, zsteps))
+        self.cmdSend("add{:}:{:}add{:}:{:}add{:}:{:}\n".format(self.motoNameX, xsteps, self.motoNameY, ysteps, self.motoNameZ, zsteps))
         self.waitStop()
 
     def mvZ(self, z):
         self.zState = 1
-        self.cmdSend("addZ:{:}\n".format(int(z / self.zStepLen)))
+        self.cmdSend("add{:}:{:}\n".format(self.motoNameZ, int(z / self.zStepLen)))
         self.waitStop()
     
     def mvY(self, y):
         self.yState = 1
-        self.cmdSend("addY:{:}\n".format(int(y / self.yStepLen)))
+        self.cmdSend("add{:}:{:}\n".format(self.motoNameY, int(y / self.yStepLen)))
         self.waitStop()
 
     def mvX(self, x):
         self.xState = 1
-        self.cmdSend("addX:{:}\n".format(int(x / self.xStepLen)))
+        self.cmdSend("add{:}:{:}\n".format(self.motoNameX, int(x / self.xStepLen)))
         self.waitStop()
 
     def pick(self):
@@ -166,14 +172,14 @@ class Robot():
         self.cmdSend("setP.pump:1\n")
     
     def lock(self):
-        self.cmdSend("setX.stepperen:0\n")
-        self.cmdSend("setY.stepperen:0\n")
-        self.cmdSend("setZ.stepperen:0\n")
+        self.cmdSend("set{:}.stepperen:0\n".format(self.motoNameX))
+        self.cmdSend("set{:}.stepperen:0\n".format(self.motoNameY))
+        self.cmdSend("set{:}.stepperen:0\n".format(self.motoNameZ))
 
     def unlock(self):
-        self.cmdSend("setX.stepperen:1\n")
-        self.cmdSend("setY.stepperen:1\n")
-        self.cmdSend("setZ.stepperen:1\n")
+        self.cmdSend("set{:}.stepperen:1\n".format(self.motoNameX))
+        self.cmdSend("set{:}.stepperen:1\n".format(self.motoNameY))
+        self.cmdSend("set{:}.stepperen:1\n".format(self.motoNameZ))
 
     def reset(self):
         self.release()
@@ -185,9 +191,9 @@ class Robot():
         print("go reset postion done")
         time.sleep(1)
         
-        self.cmdSend("setX.currentPosition:0\n")
-        self.cmdSend("setY.currentPosition:0\n")
-        self.cmdSend("setZ.currentPosition:0\n")
+        self.cmdSend("set{:}.currentPosition:0\n".format(self.motoNameX))
+        self.cmdSend("set{:}.currentPosition:0\n".format(self.motoNameY))
+        self.cmdSend("set{:}.currentPosition:0\n".format(self.motoNameZ))
         time.sleep(1)
     
     def isStop(self):
@@ -199,11 +205,11 @@ class Robot():
 
         if self.stateUpdateTime +5 <= int(time.time()):
             if self.xState == 1:
-                self.cmdSend("getX.status\n")
+                self.cmdSend("get{:}.status\n".format(self.motoNameX))
             if self.yState == 1:
-                self.cmdSend("getY.status\n")
+                self.cmdSend("get{:}.status\n".format(self.motoNameY))
             if self.zState == 1:
-                self.cmdSend("getZ.status\n")
+                self.cmdSend("get{:}.status\n".format(self.motoNameZ))
             self.stateUpdateTime = int(time.time())
             # print("check stop cmd: ", self.stateUpdateTime, ":", self.xState, self.yState, self.zState)
         return False
@@ -319,7 +325,7 @@ def demo1():
     
     print("stop demo")
     chess.goHome()
-    robot.luck()
+    robot.lock()
     time.sleep(1)
 
 def key_cmd_list():

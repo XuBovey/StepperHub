@@ -329,12 +329,17 @@ class new_retail():
         while self.robot.lLimitStopEvent == False and self.robot._running:
             time.sleep(0.5)
         current_time = int(time.time())
-        while current_time > int(time.time()) - 4:
+        while current_time > int(time.time()) - 4: # 等待
             current_time = int(time.time())
-            print("move line")
             self.robot.mvL(550)
+    
+    def mv_box(self, len_mm=550):
+        current_time = int(time.time())
+        while current_time > int(time.time()) - 4: # 等待
+            current_time = int(time.time())
+            self.robot.mvL(len_mm)
 
-    def demo1(self):
+    def demo1(self, step):
         i = 1
         pic_p = postion_list[0]
         print("demo1")
@@ -416,10 +421,11 @@ if __name__ == '__main__':
 
     demo = new_retail(robot)
 
+    demo_step = 1
     while demo.robot._running == True:
         if demo_show == 1:
             demo_show = 0
-            demo.demo1()
+            demo.demo1(demo_step)
         time.sleep(1)
 
     print("exit")
