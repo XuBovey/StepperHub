@@ -159,10 +159,10 @@ void input_scan(void){
 
   for(i=0; i < MOTO_MAX; i++){
     if (moto_limited_io[i].port != NULL){
-      if (HAL_GPIO_ReadPin(moto_limited_io[i].port, moto_limited_io[i].pin) == GPIO_PIN_RESET) //开关闭合
+      if (HAL_GPIO_ReadPin(moto_limited_io[i].port, moto_limited_io[i].pin) == moto_limited_io[i].active_state) //开关闭合
+      {
         Stepper_LimitedSwitchUpdate(motoTable[i].name, LS_ADD);
-      // else if ()// not support
-      //   Stepper_LimitedSwitchUpdate(motoTable[i].name, LS_SUB);
+      }
       else
         Stepper_LimitedSwitchUpdate(motoTable[i].name, LS_NORMAL);
     }

@@ -4,7 +4,8 @@
 #include "stm32f4xx_hal.h"
 #include "serial.h"
 
-#define VERSION "V0.1.3.02 2021-2-19"
+// #define VERSION "V0.1.3.02 2021-2-19"
+#define VERSION "V0.1.3.04 2021-3-18"
 
 // #define MOTO_EN_USED
 
@@ -36,6 +37,7 @@ typedef struct
 {
     uint8_t last_state;
     uint8_t current_state;
+    uint8_t active_state;
     GPIO_TypeDef* port;
     uint16_t pin;
 }_moto_limited;

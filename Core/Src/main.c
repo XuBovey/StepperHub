@@ -60,13 +60,13 @@ _moto motoTable[MOTO_MAX] = {
 
 _moto_limited moto_limited_io[MOTO_MAX] = {
 #ifdef ARM_ROBOT
-  {1, 1, M0_LIMIT_GPIO_Port, M0_LIMIT_Pin}, //Y7
-  {1, 1, M1_LIMIT_GPIO_Port, M1_LIMIT_Pin}, //Y5
-  {1, 1, M2_LIMIT_GPIO_Port, M2_LIMIT_Pin}, //Y8
+  {1, 1, 0, M0_LIMIT_GPIO_Port, M0_LIMIT_Pin}, //Y7
+  {1, 1, 0, M1_LIMIT_GPIO_Port, M1_LIMIT_Pin}, //Y5
+  {1, 1, 0, M2_LIMIT_GPIO_Port, M2_LIMIT_Pin}, //Y8
 #endif
 
 #ifdef  BELT_ROBOT
-  {1, 1, M3_LIMIT_GPIO_Port, M3_LIMIT_Pin}, //X10
+  {1, 1, 0, M3_LIMIT_GPIO_Port, M3_LIMIT_Pin}, //X10
 #endif
 };
 

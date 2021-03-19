@@ -22,6 +22,8 @@
 
 /* USER CODE BEGIN 0 */
 #include "serial.h"
+#include "stepperCommands.h"
+#include "common.h"
 
 /* USER CODE END 0 */
 
@@ -606,19 +608,38 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
+extern _moto motoTable[];
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   static int count = 0;
+  static int count2 = 0;
+  int i = 0;
+  stepper_state * stepper;
+
   if(htim->Instance==TIM5)
   {
     input_scan();
     Stepper_ExecuteAllControllers();
     Serial_CheckRxTimeout();
     
-    if (count ++ > 100)
+    if (count ++ > 100) //ms
     {
       count = 0;
       led_toggle(LED_YEL_GPIO_Port, LED_YEL_Pin);
+    }
+
+    if (count2 ++ > 1000) //ms
+    {
+      count2 = 0;
+
+      for (i=0; i < MOTO_MAX; i++)
+      {
+        stepper = GetState(motoTable[i].name);
+        if (stepper->limitedState != LS_NORMAL)
+        {
+          kprintf("limited %c.stop\r\n", motoTable[i].name);
+        }
+      }
     }
   }
 }
