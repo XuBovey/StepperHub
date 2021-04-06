@@ -3,9 +3,10 @@ from threading import Thread
 import time
 import serial
 from robot_arm_ik import robot_arm_ik
-from getchar import getChar
+from robot_key_ctrl import ROBOT_KeyCtrl
 
 COM_PORT = 'COM7'
+_status = True
 
 _STEP = 50
 _CMD = 0
@@ -57,7 +58,6 @@ class Robot():
 
         self.motoResetState = [False, False, False]
 
-        self._running = True
         self.stateUpdateTime = time.time()
 
     def getMotoStopVol(self, moto):
@@ -83,7 +83,7 @@ class Robot():
     def rxTask(self):
         while True:
             while self.transport.in_waiting == 0:
-                if self._running == False:
+                if _status == False:
                     return
                 pass
             data_all = str(self.transport.readall())
@@ -105,7 +105,7 @@ class Robot():
                         self.currentAngle = self.targetAngle[:]
      
                 elif 'stop' in str_data: # limited stop
-                    print(str_data)
+                    # print(str_data)
                     if "M.stop" in str_data:
                         self.setMotoStopVol('M',True)
                         if "limit" in str_data:
@@ -128,9 +128,9 @@ class Robot():
                         self.curY = self.targetY
                         self.curZ = self.targetZ
                         self.currentAngle = self.targetAngle[:]
-                # else "Error" in str_data:
-                else:
+                elif "Error" in str_data:
                     print(str_data)
+                    # _status = False
 
     def cmdSend(self, data):
         self.transport.write(data.encode('UTF-8'))
@@ -262,7 +262,7 @@ class Robot():
         print("reset done")
 
     def isStop(self):
-        if self._running == False:
+        if _status == False:
             return True
 
         if self.mStop  and self.nStop and self.oStop:
@@ -326,7 +326,7 @@ class new_retail():
     def wait_box(self):
         self.robot.setMotoStopVol('L', False)
         self.robot.lLimitStopEvent = False
-        while self.robot.lLimitStopEvent == False and self.robot._running:
+        while self.robot.lLimitStopEvent == False and _status:
             time.sleep(0.5)
         current_time = int(time.time())
         while current_time > int(time.time()) - 4: # 等待
@@ -369,52 +369,54 @@ def key_cb(key):
     global _STEP
     global _CMD
     global demo_show
+    global _status
 
-    print(key.upper())
-    if key == b'Z' or key == B'\x03': robot._running = False
-    if key == b'R': 
+    if key == 0:
+        return
+
+    print('handle', key)
+    # print(key.upper())
+    if key == 'Z' or key == '\x03': 
+        print('exit...')
+        _status = False
+    if key == 'R': 
         robot.reset() 
         print("reset done")
-    if key == b'H': key_cmd_list()
-    if key == b'P': robot.pick()
-    if key == b'O': robot.release()
-    if key == b'A': robot.mvAngle('M', _STEP * self.anglePerStep, False) # M 底盘
-    if key == b'D': robot.mvAngle('M', -_STEP * self.anglePerStep, False)
-    if key == b'W': robot.mvAngle('N', _STEP * self.anglePerStep, False) # N 大臂
-    if key == b'S': robot.mvAngle('N', -_STEP * self.anglePerStep, False)
-    if key == b'Q': robot.mvAngle('O', _STEP * self.anglePerStep, False) # O 小臂
-    if key == b'E': robot.mvAngle('O', -_STEP * self.anglePerStep, False)
-    if key == b'M': robot.mvL(600)
-    if key == b'N': robot.mvL(-600)
-    if key == b'B': robot.goPostion(p_home)
-    if key == b'+' or key == b'=': 
+    if key == 'H': key_cmd_list()
+    if key == 'P': robot.pick()
+    if key == 'O': robot.release()
+    if key == 'A': robot.mvAngle('M', _STEP * self.anglePerStep, False) # M 底盘
+    if key == 'D': robot.mvAngle('M', -_STEP * self.anglePerStep, False)
+    if key == 'W': robot.mvAngle('N', _STEP * self.anglePerStep, False) # N 大臂
+    if key == 'S': robot.mvAngle('N', -_STEP * self.anglePerStep, False)
+    if key == 'Q': robot.mvAngle('O', _STEP * self.anglePerStep, False) # O 小臂
+    if key == 'E': robot.mvAngle('O', -_STEP * self.anglePerStep, False)
+    if key == 'M': robot.mvL(600)
+    if key == 'N': robot.mvL(-600)
+    if key == '': robot.goPostion(p_home)
+    if key == '+' or key == '=': 
         _STEP = _STEP + 10 if _STEP < 100  else 100
         print("_STEP:",_STEP)
-    if key == b'-' or key == b'_': 
+    if key == '-' or key == '_': 
         _STEP = _STEP - 10 if _STEP > 20  else 10
         print("_STEP:",_STEP)
-    if key == b'1': _CMD = 1
-    if key == b'2': _CMD = 2
-    if key == b'3': _CMD = 3
-    if key == b'4': _CMD = 4
-    if key == b'5': _CMD = 5
-    if key == b'T': demo_show = 1
-
-def key_scan():
-    while robot._running == True:
-        key_cb(getChar().upper())
-        pass
+    if key == '1': _CMD = 1
+    if key == '2': _CMD = 2
+    if key == '3': _CMD = 3
+    if key == '4': _CMD = 4
+    if key == '5': _CMD = 5
+    if key == 'T': demo_show = 1
 
 transport = serial.Serial(port=COM_PORT, baudrate = 115200, timeout=0.1)
 robot = Robot(transport)
 
 if __name__ == '__main__':
     robotRxTask = Thread(target = robot.rxTask)
-    keyTask = Thread(target = key_scan)
     print("start")
     
     robotRxTask.start()
-    keyTask.start()
+
+    key_ctr= ROBOT_KeyCtrl(key_cb)
 
     key_cmd_list()
     print("\r\n\r\n警告: 启动前确保，限位器没有动作，且远离其他结构件！\r\n\r\n")
@@ -422,13 +424,11 @@ if __name__ == '__main__':
     demo = new_retail(robot)
 
     demo_step = 1
-    while demo.robot._running == True:
+    while _status == True:
         if demo_show == 1:
             demo_show = 0
             demo.demo1(demo_step)
         time.sleep(1)
 
     print("exit")
-    if transport.isOpen():
-        transport.flush()
-        transport.close()
+    exit()

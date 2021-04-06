@@ -3,7 +3,6 @@ from threading import Thread
 import time
 import serial
 from robot_key_ctrl import ROBOT_KeyCtrl
-# from getchar import getChar
 
 COM_PORT = "COM7"
 
@@ -83,6 +82,7 @@ class Robot():
                 if _status == False:
                     return
                 pass
+            
             data = str(transport.readall())
             data_list = data.split('\\n')
             for str_data in data_list:
@@ -103,7 +103,7 @@ class Robot():
                         self.zState = 0
                 elif 'Error' in str_data:
                     print(str_data)
-                    _status = False
+                    # _status = False
 
     def cmdSend(self, data):
         self.transport.write(data.encode('UTF-8'))
@@ -364,7 +364,6 @@ def key_cmd_list():
 
 def key_cb(key):
     global _status
-# def loop(key):
     global _STEP
     global _CMD
     global demo_sel
@@ -402,29 +401,12 @@ def key_cb(key):
     if key == '2': demo_sel = 2
     if key == '0': demo_sel = 0
 
-# last_key = 0
-# def key_cb(key):
-#     global last_key
-#     last_key = key.upper()
-#     print('input', last_key)
-
-# def key_scan():
-#     while _status == True:
-#         key_cb(getChar().upper().decode())
-#         pass
-
-# keyTask = Thread(target = key_scan)
-# keyTask.start()
-
-
 transport = serial.Serial(port=COM_PORT, baudrate = 115200, timeout = 0.1)
 robot = Robot(transport)
 robotRxTask = Thread(target = robot.rxTask)
 chess = Chess(robot = robot)
 
 if __name__ == '__main__':
-    
-
     robotRxTask.start()
 
     key_ctr= ROBOT_KeyCtrl(key_cb)
