@@ -51,6 +51,80 @@
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
+typedef struct {
+    unsigned int crash_time;
+    unsigned int is_crash;
+    /* register info*/
+    unsigned long stacked_r0;
+    unsigned long stacked_r1;  
+    unsigned long stacked_r2; 
+    unsigned long stacked_r3;    
+    unsigned long stacked_r12;  
+    unsigned long stacked_lr;  
+    unsigned long stacked_pc;  
+    unsigned long stacked_psr;  
+    unsigned long SHCSR;  
+    unsigned long MFSR;  
+    unsigned long BFSR;   
+    unsigned long UFSR;  
+    unsigned long HFSR;  
+    unsigned long DFSR;  
+    unsigned long MMAR;  
+    unsigned long BFAR;
+} System_Crash_Info;
+
+static System_Crash_Info crash_info;
+void hard_fault_handler_c(unsigned int * hardfault_args)
+{
+  memset(&crash_info, 0, sizeof(System_Crash_Info));
+
+  crash_info.is_crash = 1;
+  crash_info.crash_time = (unsigned int)HAL_GetTick();
+
+  crash_info.stacked_r0 = ((unsigned long) hardfault_args[0]);
+  crash_info.stacked_r1 = ((unsigned long) hardfault_args[1]);
+  crash_info.stacked_r2 = ((unsigned long) hardfault_args[2]);
+  crash_info.stacked_r3 = ((unsigned long) hardfault_args[3]);
+  crash_info.stacked_r12 = ((unsigned long) hardfault_args[4]);
+  crash_info.stacked_lr = ((unsigned long) hardfault_args[5]);
+  crash_info.stacked_pc = ((unsigned long) hardfault_args[6]);
+  crash_info.stacked_psr = ((unsigned long) hardfault_args[7]);
+
+  crash_info.MFSR = (*((volatile unsigned char *)(0xE000ED28))); //存储器管理fault状态寄存器
+  crash_info.BFSR = (*((volatile unsigned char *)(0xE000ED29))); //总线fault状态寄存器
+  crash_info.UFSR = (*((volatile unsigned short int *)(0xE000ED2A)));//用法fault状态寄存器
+  crash_info.HFSR = (*((volatile unsigned long *)(0xE000ED2C)));  //硬fault状态寄存器
+  crash_info.DFSR = (*((volatile unsigned long *)(0xE000ED30))); //调试fault状态寄存器
+  crash_info.MMAR = (*((volatile unsigned long *)(0xE000ED34))); //存储管理地址寄存器
+  crash_info.BFAR = (*((volatile unsigned long *)(0xE000ED38))); //总线fault地址寄存器
+
+  kprintf("Error: HardFault_Handler hard_fault_handler_c\nError: R0 = 0x%08x\nError: R1 = 0x%08x\nError: R2 = 0x%08x\nError: R3 = 0x%08x\nError: R12 = 0x%08x\nError: lr = 0x%08x\nError: pc = 0x%08x\nError: psr = 0x%08x\nError: MFSR = 0x%08x\nError: BFSR = 0x%08x\nError: UFSR = 0x%08x\nError: HFSR = 0x%08x\nError: DFSR = 0x%08x\nError: MMAR = 0x%08x\nError: BFAR = 0x%08x\n"
+          ,crash_info.stacked_r0
+          ,crash_info.stacked_r1
+          ,crash_info.stacked_r2
+          ,crash_info.stacked_r3
+          ,crash_info.stacked_r12
+          ,crash_info.stacked_lr
+          ,crash_info.stacked_pc
+          ,crash_info.stacked_psr
+          ,crash_info.MFSR
+          ,crash_info.BFSR
+          ,crash_info.UFSR
+          ,crash_info.HFSR
+          ,crash_info.DFSR
+          ,crash_info.MMAR
+          ,crash_info.BFAR);
+}
+
+/* hard fault interrupt handler */
+void _int_hardfault_isr( )
+{
+__asm("TST LR, #4");
+__asm("ITE EQ");
+__asm("MRSEQ R0,MSP");
+__asm("MRSNE R0,PSP");
+__asm("B hard_fault_handler_c");
+}
 
 /* USER CODE END PFP */
 
@@ -96,7 +170,8 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
-  kprintf("Error: HardFault_Handler\r\n");
+  kprintf("Error: HardFault_Handler\n");
+  _int_hardfault_isr();
   stopAllStepper();
   Stepper_SetEn('X', 0);
   Stepper_SetEn('Y', 0);
@@ -115,7 +190,7 @@ void HardFault_Handler(void)
 void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
-  kprintf("Error: MemManage_Handler\r\n");
+  kprintf("Error: MemManage_Handler\n");
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
   {
@@ -130,7 +205,7 @@ void MemManage_Handler(void)
 void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
-  kprintf("Error: BusFault_Handler\r\n");
+  kprintf("Error: BusFault_Handler\n");
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
   {
@@ -145,7 +220,7 @@ void BusFault_Handler(void)
 void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */
-  kprintf("Error: UsageFault_Handler\r\n");
+  kprintf("Error: UsageFault_Handler\n");
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
   {

@@ -10,6 +10,7 @@ COM_PORT = "COM7"
 _STEP = 10
 _CMD = 0
 demo_sel = 0
+_status = True
 
 # 棋盘0，0坐标位置
 BOARD_Z_MV_LEN = 18
@@ -69,7 +70,6 @@ class Robot():
         self.yState = 0 # stop
         self.zState = 0 # stop
 
-        self._running = True
         self.stateUpdateTime = int(time.time())
         
         self.motoNameX = 'M'
@@ -77,9 +77,10 @@ class Robot():
         self.motoNameZ = 'O'
     
     def rxTask(self):
+        global _status
         while True:
             while self.transport.in_waiting == 0:
-                if self._running == False:
+                if _status == False:
                     return
                 pass
             data = str(transport.readall())
@@ -102,7 +103,7 @@ class Robot():
                         self.zState = 0
                 elif 'Error' in str_data:
                     print(str_data)
-                    self._running = False
+                    _status = False
 
     def cmdSend(self, data):
         self.transport.write(data.encode('UTF-8'))
@@ -197,7 +198,8 @@ class Robot():
         time.sleep(1)
     
     def isStop(self):
-        if self._running == False:
+        global _status
+        if _status == False:
             return True
         
         if self.xState == 0 and self.yState == 0 and self.zState == 0:
@@ -294,6 +296,7 @@ def exit():
         transport.close()
 
 def demo1():
+    global _status
     robot.unlock()
     time.sleep(1)
     chess.goHome()
@@ -308,7 +311,7 @@ def demo1():
         chess.getChess(row = int(step_count/4) + 6, col = step_count % 4, sel = 0)
         chess.putChess(row = step[1][0]-1, col = ord(step[1][1])-ord('A'), sel = 1) # white
         step_count = step_count + 1
-        if robot._running == False:
+        if _status == False:
             exit()
     
     print("pick all chess back")
@@ -320,7 +323,7 @@ def demo1():
         chess.getChess(row = step[1][0]-1, col = ord(step[1][1])-ord('A'), sel = 1) # white
         chess.putChess(row = int(step_count/4) + 6, col = step_count % 4, sel = 0)
         step_count = step_count - 1
-        if robot._running == False:
+        if _status == False:
             exit()
     
     print("stop demo")
@@ -334,14 +337,18 @@ def demo1():
 # 往复50次后停止，查看线条轨迹误差
 # 比较闭环和非闭环驱动差异
 def demo2():
+    global _status
     print("moto test")
     postion1 = [-150,-150,0]
     postion2 = [0,150,0]
     postion3 = [150,0,0]
-    while count < 50:
+    count = 0
+    while _status == True:
         robot.mvPostion(postion1)
         robot.mvPostion(postion2)
         robot.mvPostion(postion3)
+        count = count + 1
+        print(count)
 
 def key_cmd_list():
     print("Z - exit     R - reset")
@@ -356,6 +363,7 @@ def key_cmd_list():
 
 
 def key_cb(key):
+    global _status
 # def loop(key):
     global _STEP
     global _CMD
@@ -367,7 +375,7 @@ def key_cb(key):
     print('handle', key)
     if key == 'Z' or key == '\x03': 
         print('exit...')
-        robot._running = False
+        _status = False
     if key == 'R': 
         robot.reset()
         print("1 - demo1")
@@ -401,7 +409,7 @@ def key_cb(key):
 #     print('input', last_key)
 
 # def key_scan():
-#     while robot._running == True:
+#     while _status == True:
 #         key_cb(getChar().upper().decode())
 #         pass
 
@@ -415,13 +423,15 @@ robotRxTask = Thread(target = robot.rxTask)
 chess = Chess(robot = robot)
 
 if __name__ == '__main__':
+    
+
     robotRxTask.start()
 
     key_ctr= ROBOT_KeyCtrl(key_cb)
 
     key_cmd_list()
 
-    while robot._running == True:
+    while _status == True:
         if demo_sel == 1:
             demo_sel = 0
             print("start demo1")
