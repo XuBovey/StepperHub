@@ -328,6 +328,21 @@ def demo1():
     robot.lock()
     time.sleep(1)
 
+# 先把机械臂z轴放xy轴中间位置
+# 固定好写字笔
+# demo 将往复划线
+# 往复50次后停止，查看线条轨迹误差
+# 比较闭环和非闭环驱动差异
+def demo2():
+    print("moto test")
+    postion1 = [-150,-150,0]
+    postion2 = [0,150,0]
+    postion3 = [150,0,0]
+    while count < 50:
+        robot.mvPostion(postion1)
+        robot.mvPostion(postion2)
+        robot.mvPostion(postion3)
+
 def key_cmd_list():
     print("Z - exit     R - reset")
     print("P - pick     O - put")
