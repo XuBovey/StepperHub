@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.c
-  * Description        : This file provides code for the configuration
-  *                      of all used GPIO pins.
+  * @file    gpio.c
+  * @brief   This file provides code for the configuration
+  *          of all used GPIO pins.
   ******************************************************************************
   * @attention
   *
@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "gpio.h"
+
 /* USER CODE BEGIN 0 */
 #include "stepperController.h"
 
@@ -159,7 +160,7 @@ void input_scan(void){
 
   for(i=0; i < MOTO_MAX; i++){
     if (moto_limited_io[i].port != NULL){
-      if (HAL_GPIO_ReadPin(moto_limited_io[i].port, moto_limited_io[i].pin) == moto_limited_io[i].active_state) //开关闭合
+      if (HAL_GPIO_ReadPin(moto_limited_io[i].port, moto_limited_io[i].pin) == moto_limited_io[i].active_state) //�?关闭�?
       {
         Stepper_LimitedSwitchUpdate(motoTable[i].name, LS_ADD);
       }
