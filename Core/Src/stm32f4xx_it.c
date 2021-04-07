@@ -114,17 +114,23 @@ void hard_fault_handler_c(unsigned int * hardfault_args)
           ,crash_info.DFSR
           ,crash_info.MMAR
           ,crash_info.BFAR);
+
+  // stopAllStepper();
+  // Stepper_SetEn('X', 0);
+  // Stepper_SetEn('Y', 0);
+  // Stepper_SetEn('Z', 0);
+  while(1);
 }
 
 /* hard fault interrupt handler */
-void _int_hardfault_isr( )
-{
-__asm("TST LR, #4");
-__asm("ITE EQ");
-__asm("MRSEQ R0,MSP");
-__asm("MRSNE R0,PSP");
-__asm("B hard_fault_handler_c");
-}
+// void _int_hardfault_isr( )
+// {
+// __asm("TST LR, #4");
+// __asm("ITE EQ");
+// __asm("MRSEQ R0,MSP");
+// __asm("MRSNE R0,PSP");
+// __asm("B hard_fault_handler_c");
+// }
 
 /* USER CODE END PFP */
 
@@ -170,12 +176,17 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
-  kprintf("Error: HardFault_Handler\n");
-  _int_hardfault_isr();
-  stopAllStepper();
-  Stepper_SetEn('X', 0);
-  Stepper_SetEn('Y', 0);
-  Stepper_SetEn('Z', 0);
+//  kprintf("Error: HardFault_Handler\n");
+__asm("TST LR, #4");
+__asm("ITE EQ");
+__asm("MRSEQ R0,MSP");
+__asm("MRSNE R0,PSP");
+__asm("B hard_fault_handler_c");
+  // _int_hardfault_isr();
+  // stopAllStepper();
+  // Stepper_SetEn('X', 0);
+  // Stepper_SetEn('Y', 0);
+  // Stepper_SetEn('Z', 0);
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
